@@ -32,7 +32,7 @@ class Elemento(_database.Base):
     proveedor = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     tipo = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
 
-    fecha_adquisicion = _sqlalchemy.Column(_sqlalchemy.DateTime, default=_datetime.datetime.now(), nullable=True)
+    fecha_adquisicion = _sqlalchemy.Column(_sqlalchemy.DateTime, default=_datetime.datetime.now, nullable=True)
     fecha_caducidad = _sqlalchemy.Column(_sqlalchemy.DateTime, nullable=True)
     
     peso = _sqlalchemy.Column(_sqlalchemy.Float, nullable=True)
@@ -59,6 +59,8 @@ class Libro(Elemento):
     __tablename__ = 'libro'
 
     uuid = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("elemento.uuid"), primary_key=True)
+    # titulo = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("elemento.nombre"), primary_key=True)
+    
     isbn = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     autor = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     genero = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
@@ -82,14 +84,24 @@ class Libro(Elemento):
     def delete(self):
         pass
 
-# class Juguete(Elemento):
-#     __tablename__ = "juguete"
-#     uuid = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("elemento.uuid"), primary_key=True)
-#     nombre = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
+class Juguete(Elemento):
+    __tablename__ = "juguete"
+    uuid = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("elemento.uuid"), primary_key=True)
+    # nombre = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("elemento.nombre"), primary_key=True)
+    
+    rango_edad = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
+    __mapper_args__ = {
+        "polymorphic_identity": "juguete",
+    }
 
-#     __mapper_args__ = {
-#         "polymorphic_identity": "juguete",
-#     }
+    def insert(self):
+        pass
+
+    def update(self):
+        pass
+
+    def delete(self):
+        pass
 
 """
 MANAGE UUID
