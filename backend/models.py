@@ -37,7 +37,7 @@ class Elemento(_database.Base):
     
     peso = _sqlalchemy.Column(_sqlalchemy.Float, nullable=True)
     precio_compra = _sqlalchemy.Column(_sqlalchemy.Float, nullable=True)
-    
+    sede = _sqlalchemy.Column(_sqlalchemy.Float, nullable=True)
     __mapper_args__ = {
         "polymorphic_identity": "elemento",
         "polymorphic_on": peso,
