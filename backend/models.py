@@ -11,6 +11,7 @@ class Usuario(_database.Base):
     password = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     email = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     documento = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
+    sede = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
 
     def insert(self):
         pass
@@ -37,7 +38,7 @@ class Elemento(_database.Base):
     
     peso = _sqlalchemy.Column(_sqlalchemy.Float, nullable=True)
     precio_compra = _sqlalchemy.Column(_sqlalchemy.Float, nullable=True)
-    sede = _sqlalchemy.Column(_sqlalchemy.Float, nullable=True)
+    sede = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)    
     __mapper_args__ = {
         "polymorphic_identity": "elemento",
         "polymorphic_on": peso,

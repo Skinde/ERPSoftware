@@ -57,6 +57,8 @@ async def create_user(
     except Exception as e:
         print(e)
 
+
+
 @app.post("/api/token")
 async def generate_token(
     form_data: _security.OAuth2PasswordRequestForm = _fastapi.Depends(),
@@ -65,7 +67,9 @@ async def generate_token(
     user: dict = await _services.authenticate_user(form_data.username, form_data.password, mongo_db)
     
     if not user:
-        raise _fastapi.HTTPException(status_code=401, detail="Invalid Credentials")
+        raise _fastapi.HTTPException(status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},)
 
     response: dict = await _services.create_token(user)
     return response
@@ -74,6 +78,14 @@ async def generate_token(
 @app.get("/api/users/me")
 async def get_current_user(current_user = _fastapi.Depends(_services.get_current_user)):
     return current_user
+
+@app.get("/api/elementos")
+async def get_elementos(current_user = _fastapi.Depends(_services.get_current_user), db: _orm.Session = _fastapi.Depends(_database.get_db),
+                        limit: int = 10, page: int = 1, search: str = ''):
+    paging: int = (page - 1) * limit
+    elementos =  db.query(_models.Elemento).group_by(_models.Elemento.uuid).limit(limit).offset(paging).all()
+    return {'status': 'success', 'results': len(elementos), 'Elementos': elementos}
+
 
 # TEST ENDPOINTS
 @app.post("/try/users")
@@ -93,7 +105,7 @@ async def sign_up(username: str, password: str):
             "inserted_id": str(response.inserted_id)
         }
     }
-
+"""
 @app.get("/try/users/{user_email}")
 async def query_user(user_email):
     # MONGO
@@ -103,7 +115,7 @@ async def query_user(user_email):
     return {
         "mongo_db": { k:str(v) for k,v in db_response.items() }
     }
-
+"""
 """
 TASKS:
 - manage migrations with sqlalchemy

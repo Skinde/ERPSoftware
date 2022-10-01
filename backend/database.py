@@ -13,6 +13,13 @@ Session = _orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = _orm.declarative_base(bind=engine)
 
+def get_db():
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()
+
 """
 SOURCE:
     https://docs.sqlalchemy.org/en/14/orm/quickstart.html
