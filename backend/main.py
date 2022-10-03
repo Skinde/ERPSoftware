@@ -1,5 +1,6 @@
 import fastapi as _fastapi
 import fastapi.security as _security
+import json as _json
 import passlib.hash as _hash
 import pymongo as _pymongo
 
@@ -41,13 +42,12 @@ async def create_user(
     mongo_db: _pymongo.database.Database = _fastapi.Depends(_services.get_mongo_db)
 ):
     old_user: dict = mongo_db["users"].find_one({"email": user.email})
-
+    
     if old_user:
         raise _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
 
     try:
-        user.password = _hash.pbkdf2_sha256.hash(user.password)
-
+        user.password: str = _hash.pbkdf2_sha256.hash(user.password)
         response: _pymongo.results.InsertOneResult = mongo_db["users"].insert_one(user.dict())
 
         return {
@@ -58,12 +58,12 @@ async def create_user(
         print(e)
 
 
-
 @app.post("/api/token")
 async def generate_token(
     form_data: _security.OAuth2PasswordRequestForm = _fastapi.Depends(),
     mongo_db:  _pymongo.database.Database = _fastapi.Depends(_services.get_mongo_db)
 ):
+    """A valid access token is required to access this route"""
     user: dict = await _services.authenticate_user(form_data.username, form_data.password, mongo_db)
     
     if not user:
@@ -90,32 +90,36 @@ async def get_elementos(current_user = _fastapi.Depends(_services.get_current_us
 # TEST ENDPOINTS
 @app.post("/try/users")
 async def sign_up(username: str, password: str):
-    # MONGO
     mongo_db = _services.get_mongo_db()
+    collection = "users"
     
-    mongo_db["users"].delete_many({})
-    response = mongo_db["users"].insert_one({
+    del_response: _pymongo.results.DeleteResult = mongo_db[collection].delete_many({})
+    
+    response: _pymongo.results.InsertOneResult = mongo_db[collection].insert_one({
         "username": username,
-        "password": _hash.pbkdf2_sha256.hash(password)
+        "password": _hash.pbkdf2_sha256.hash(password),
     })
 
     return {
         "mongo_db": {
             "success": response.acknowledged,
-            "inserted_id": str(response.inserted_id)
+            "inserted_id": str(response.inserted_id),
+            "del response": {
+                "success": response.acknowledged,
+                "deleted count": del_response.deleted_count
+            }
         }
     }
-"""
+
 @app.get("/try/users/{user_email}")
 async def query_user(user_email):
-    # MONGO
     mongo_db = _services.get_mongo_db()
-    db_response = mongo_db["users"].find_one({"email": user_email})
+    db_response: _pymongo.results.InsertOneResult = mongo_db["users"].find_one({"email": user_email})
 
     return {
         "mongo_db": { k:str(v) for k,v in db_response.items() }
     }
-"""
+
 """
 TASKS:
 - manage migrations with sqlalchemy
@@ -123,4 +127,7 @@ TASKS:
 SOURCES:
 https://stackoverflow.com/questions/3582552/what-is-the-format-for-the-postgresql-connection-string-url
 https://www.tutorialspoint.com/sqlalchemy/index.htm
+
+TypeError: ObjectId('') is not JSON serializable
+    https://stackoverflow.com/questions/16586180/typeerror-objectid-is-not-json-serializable
 """
