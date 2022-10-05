@@ -14,7 +14,7 @@ import database as _database
 import models as _models
 import schemas as _schemas
 
-oauth2_scheme = _security.OAuth2PasswordBearer(tokenUrl="/api/token")
+oauth2_scheme = _security.OAuth2PasswordBearer(tokenUrl="/api/login")
 JWT_SECRET = os.environ.get("JWT_SECRET_KEY")
 
 def create_database():

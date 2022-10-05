@@ -93,13 +93,12 @@ async def get_elementos(
 ):
     paging: int = (page - 1) * limit
     elementos =  db.query(_models.Elemento).group_by(_models.Elemento.uuid).limit(limit).offset(paging).all()
-    
-    print(elementos, type(elementos))
-    return {
-        'status': 'success', 
-        'results': len(elementos), 
-        'elementos': elementos
-    }
+
+    elements = []
+    for row in elementos:         
+        elements.append(row.format())
+
+    return {'status': 'success', 'results': len(elements), 'Elementos': elements}
 
 
 # TEST ENDPOINTS

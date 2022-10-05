@@ -44,6 +44,18 @@ class Elemento(_database.Base):
     __mapper_args__ = {
         "polymorphic_identity": "elemento"
     }
+    def format(self):
+        return {
+            'uuid': self.uuid,
+            'nombre': self.nombre,
+            'proveedor': self.proveedor,
+            'tipo': self.tipo,
+            'fecha_adquisicion': self.fecha_adquisicion,
+            'fecha_caducidad': self.fecha_caducidad,                   
+            'peso': self.peso,                                         
+            'precio_compra': self.precio_compra,                                         
+            'sede': self.sede,                                         
+        }
 
     def insert(self):
         pass
