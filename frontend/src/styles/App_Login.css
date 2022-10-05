@@ -1,0 +1,179 @@
+body {
+    background-color: #D9D9D9;
+}
+
+.main_login_box {
+    background-color: white;
+
+    width: 440px;
+    height: 790px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    border-radius: 30px;
+}
+
+/* INPUT FORMAT */
+
+.container {
+    width:100%;
+    overflow:auto;
+}
+
+.form {
+    width:50%;
+    height:100px;
+    float:left;
+}
+
+.form1 {
+    background:#ccc;
+}
+
+.form2 {
+    background:#999;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Dekko');
+@import url('https://fonts.googleapis.com/css?family=Abel');
+.form{
+    width: 355px;
+    height: 55px;
+    max-width: 400px;
+    position: relative;
+    overflow: hidden;
+
+    /* --------------------------- */
+    margin-top: 5%;
+    margin-left: 50%;
+    transform: translate(-50%, 150%);
+
+    background-color: #D9D9D9;
+    border-radius: 10px;
+    border-color: #D9D9D9;
+
+    font-family: Abel;
+    font-size: 18px;
+}
+.form input{
+    width: 100%;
+    height: 100%;
+    background: none;
+    
+    /* Font at writing */
+    color: #03256c;
+    padding-top: 10px;
+    border: none;
+    outline: 0px;
+    
+    padding-left: 10px;
+    font-family: Abel;
+    font-size: 16px;
+    
+}
+.form .lbl-nombre { /*Line - Before */
+    width: 100%;
+    height: 100%;
+    bottom: 2px;
+    position: absolute;
+
+    pointer-events: none;
+    border-bottom: 2px solid #2541B2;
+}
+.form .lbl-nombre:after { /* Line - After */
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 100%;
+    border-bottom: 3px solid #03256c;
+    transform: translateX(-100%);
+    transition: all 0.3s ease;
+}
+.text-nomb { /* Case name */
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    transition: all 0.3s ease;
+    color: #2541B2;
+
+    margin-left: 10px;
+}
+.form input:focus + .lbl-nombre .text-nomb, .form input:valid + .lbl-nombre .text-nomb{
+    transform: translateY(-100%);
+    font-size: 16px;
+    color: #03256c;
+}
+.form input:focus + .lbl-nombre:after, .form input:valid + .lbl-nombre:after{
+    transform: translateX(0%);
+}
+@media only screen and (min-width:320px) and (max-width:768px){
+    .form{
+        width:85%;
+    }
+}
+
+/* SUBMIT BUTTON FORMAT */
+
+.button-64 {
+    max-width: 100%;
+    min-width: 110px;
+
+    align-items: center;
+    justify-content: center;
+    padding: 3.5px;
+    border: 0;
+    border-radius: 10px;
+    
+    /* Centering */
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, 250%);
+
+    background-image: linear-gradient(150deg, #2541B2 35%,#1786AC, #06BEE1);
+    box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+    box-sizing: border-box;
+
+    display: flex;
+    line-height: 1em;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    cursor: pointer;
+
+    font-family: Abel;
+    font-size: 15px;
+    color: #FFFFFF;
+}
+  
+.button-64:active, .button-64:hover {
+    outline: 0;
+}
+  
+.button-64 span {
+    background-color: #03256c;
+    padding: 16px 24px;
+    border-radius: 6px;
+    width: 100%;
+    height: 100%;
+    transition: 300ms;
+}
+  
+.button-64:hover span {
+    background: none;
+}
+  
+@media (min-width: 768px) {
+    .button-64 {
+        font-size: 15px;
+        min-width: 196px;
+    }
+}
