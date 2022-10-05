@@ -3,33 +3,34 @@ import sqlalchemy as _sqlalchemy
 import database as _database
 import uuid as _uuid
 
-class Usuario(_database.Base):
-    __tablename__ = 'usuario'
-    id = _sqlalchemy.Column(_sqlalchemy.Integer, primary_key=True, index=True)
+# class Usuario(_database.Base):
+#     __tablename__ = 'usuario'
+#     id = _sqlalchemy.Column(_sqlalchemy.Integer, primary_key=True, index=True)
 
-    username = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
-    password = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
-    email = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
-    documento = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
-    sede = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
+#     username = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
+#     password = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
+#     email = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
+#     documento = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
+#     sede = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
 
-    def insert(self):
-        pass
+#     def insert(self):
+#         pass
 
-    def update(self):
-        pass
+#     def update(self):
+#         pass
 
-    def delete(self):
-        pass
+#     def delete(self):
+#         pass
 
-    def __repr__(self) -> str:
-       return f"User({self.id} {self.username})"
+#     def __repr__(self) -> str:
+#        return f"User({self.id} {self.username})"
 
 class Elemento(_database.Base):
     __tablename__ = 'elemento'
 
     uuid = _sqlalchemy.Column(_sqlalchemy.String, primary_key=True, default=_uuid.uuid4)
-    nombre = _sqlalchemy.Column(_sqlalchemy.String)
+    # nombre = _sqlalchemy.Column(_sqlalchemy.String)
+
     proveedor = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     tipo = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
 

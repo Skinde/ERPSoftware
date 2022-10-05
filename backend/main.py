@@ -36,6 +36,7 @@ async def root():
     }
 
 # API ENDPOINTS
+#   LOGIN ENDPOINTS
 @app.post("/api/sign-up")
 async def create_user(
     user: _schemas._UserCredentials,
@@ -59,7 +60,6 @@ async def create_user(
     except Exception as e:
         print(e)
 
-
 @app.post("/api/login")
 async def generate_token(
     form_data: _security.OAuth2PasswordRequestForm = _fastapi.Depends(),
@@ -78,11 +78,11 @@ async def generate_token(
     response: dict = await _services.create_token(user)
     return response
 
-
 @app.get("/api/me")
 async def get_current_user(current_user = _fastapi.Depends(_services.get_current_user)):
     return current_user
 
+#   QUERY SERVICE
 @app.get("/api/elementos")
 async def get_elementos(
     current_user = _fastapi.Depends(_services.get_current_user), 
