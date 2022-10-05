@@ -29,7 +29,6 @@ class Elemento(_database.Base):
     def format(self):
         return {
             'uuid': self.uuid,
-            'nombre': self.nombre,
             'proveedor': self.proveedor,
             'tipo': self.tipo,
             'fecha_adquisicion': self.fecha_adquisicion,
@@ -92,6 +91,19 @@ class Libro(Elemento):
         "polymorphic_identity": "libro",
         "inherit_condition": (uuid == Elemento.uuid)
     }
+    def format(self):
+        return {
+            'uuid': self.uuid,
+            'titulo': self.titulo,
+            'isbn': self.isbn,
+            'autor': self.autor,
+            'genero': self.genero,
+            'edicion': self.edicion,                   
+            'editorial': self.editorial,                                         
+            'idioma': self.idioma,                                         
+            'fecha_publicacion': self.fecha_publicacion,                                         
+            'nro_paginas': self.nro_paginas,                                         
+        }
 
     def insert(self):
         session = _database.Session()
@@ -138,6 +150,12 @@ class Juguete(Elemento):
         "polymorphic_identity": "juguete",
         "inherit_condition": (uuid == Elemento.uuid)
     }
+    def format(self):
+        return {
+            'uuid': self.uuid,
+            'nombre': self.nombre,
+            'rango_edad': self.rango_edad,
+        }
 
     def insert(self):
         session = _database.Session()

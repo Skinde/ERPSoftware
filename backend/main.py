@@ -152,19 +152,58 @@ async def add_toys(
 # QUERY ENDPOINTS
 @app.get("/api/libros")
 async def get_books(
-    libro : _schemas._Libro,
+    #libro : _schemas._Libro,
     current_user = _fastapi.Depends(_services.get_current_user), 
-    db: _orm.Session = _fastapi.Depends(_database.get_db)
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    limit: int = 10, 
+    page: int = 1, 
+    search: str = ''
 ):
-    pass
+    paging: int = (page - 1) * limit
+
+    try:
+        elementos =  db.query(_models.Libro).limit(limit).offset(paging).all()
+        
+        elements = []
+        for row in elementos:         
+            elements.append(row.format())
+        
+        return {
+            'status': 'success', 
+            'results': len(elements),
+            'Libros': elements
+        }
+    except Exception as e:
+        print(e)
+
+    
 
 @app.get("/api/juguetes")
 async def get_toys(
-    juguete : _schemas._Juguete,
+    #juguete : _schemas._Juguete,
     current_user = _fastapi.Depends(_services.get_current_user), 
-    db: _orm.Session = _fastapi.Depends(_database.get_db)
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    limit: int = 10, 
+    page: int = 1, 
+    search: str = ''
 ):
-    pass
+    paging: int = (page - 1) * limit
+
+    try:
+        elementos =  db.query(_models.Juguete).limit(limit).offset(paging).all()
+        
+        elements = []
+        for row in elementos:         
+            elements.append(row.format())
+        
+        return {
+            'status': 'success', 
+            'results': len(elements),
+            'Juguetes': elements
+        }
+    except Exception as e:
+        print(e)
+    
 
 # TEST ENDPOINTS
 """ 
