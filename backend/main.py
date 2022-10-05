@@ -1,6 +1,3 @@
-from csv import excel_tab
-from os import stat
-from xml.dom.minidom import Element
 import fastapi as _fastapi
 import fastapi.security as _security
 import json as _json
@@ -120,7 +117,18 @@ async def add_books(
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db)
 ):
-    pass
+    try:
+        libro = dict(libro)
+        libro = _models.Libro(**libro)
+        libro_uuid = libro.insert()
+
+        return {
+            "uuid": libro_uuid,
+            "success": True,
+            "libro": libro
+        }
+    except Exception as e:
+        print(e)
 
 @app.post("/api/juguetes")
 async def add_toys(
@@ -130,15 +138,11 @@ async def add_toys(
 ):
     try:
         juguete = dict(juguete)
-
-        elemento = _schemas._Elemento(**juguete)
-        elemento_uuid = _models.Elemento(**dict(elemento)).insert()
-
-        juguete["uuid"] = elemento_uuid
         juguete = _models.Juguete(**juguete)
-        juguete.insert()
+        juguete_uuid = juguete.insert()
         
         return {
+            "uuid": juguete_uuid,
             "success": True,
             "juguete": juguete
         }

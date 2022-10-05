@@ -145,7 +145,7 @@ class Juguete(Elemento):
             session.add(self)
             session.commit()
 
-            return uuid
+            return self.uuid
         except Exception as e:
             session.rollback()
         finally:
