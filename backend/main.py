@@ -36,58 +36,74 @@ async def root():
     }
 
 # API ENDPOINTS
-@app.post("/api/users")
+@app.post("/api/sign-up")
 async def create_user(
-    user: _schemas._UserCreate,
+    user: _schemas._UserCredentials,
     mongo_db: _pymongo.database.Database = _fastapi.Depends(_services.get_mongo_db)
 ):
+    """Check if email already registered and register new user"""
     old_user: dict = mongo_db["users"].find_one({"email": user.email})
     
     if old_user:
         raise _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
 
     try:
-        user.password: str = _hash.pbkdf2_sha256.hash(user.password)
+        user.password: str = _hash.bcrypt.hash(user.password)
         response: _pymongo.results.InsertOneResult = mongo_db["users"].insert_one(user.dict())
 
         return {
             "success": response.acknowledged,
+            "message": "User create successfully" if response.acknowledged else "Email already in use",
             "inserted_id": str(response.inserted_id)
         }
     except Exception as e:
         print(e)
 
 
-@app.post("/api/token")
+@app.post("/api/login")
 async def generate_token(
     form_data: _security.OAuth2PasswordRequestForm = _fastapi.Depends(),
     mongo_db:  _pymongo.database.Database = _fastapi.Depends(_services.get_mongo_db)
 ):
-    """A valid access token is required to access this route"""
+    """Login user if exists in collection and return JWT"""
     user: dict = await _services.authenticate_user(form_data.username, form_data.password, mongo_db)
     
     if not user:
-        raise _fastapi.HTTPException(status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
+        raise _fastapi.HTTPException(
+            status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},)
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
     response: dict = await _services.create_token(user)
     return response
 
 
-@app.get("/api/users/me")
+@app.get("/api/me")
 async def get_current_user(current_user = _fastapi.Depends(_services.get_current_user)):
     return current_user
 
 @app.get("/api/elementos")
-async def get_elementos(current_user = _fastapi.Depends(_services.get_current_user), db: _orm.Session = _fastapi.Depends(_database.get_db),
-                        limit: int = 10, page: int = 1, search: str = ''):
+async def get_elementos(
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    limit: int = 10, 
+    page: int = 1, 
+    search: str = ''
+):
     paging: int = (page - 1) * limit
     elementos =  db.query(_models.Elemento).group_by(_models.Elemento.uuid).limit(limit).offset(paging).all()
-    return {'status': 'success', 'results': len(elementos), 'Elementos': elementos}
+    
+    print(elementos, type(elementos))
+    return {
+        'status': 'success', 
+        'results': len(elementos), 
+        'elementos': elementos
+    }
 
 
 # TEST ENDPOINTS
+""" 
 @app.post("/try/users")
 async def sign_up(username: str, password: str):
     mongo_db = _services.get_mongo_db()
@@ -119,6 +135,7 @@ async def query_user(user_email):
     return {
         "mongo_db": { k:str(v) for k,v in db_response.items() }
     }
+"""
 
 """
 TASKS:

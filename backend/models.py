@@ -39,9 +39,9 @@ class Elemento(_database.Base):
     peso = _sqlalchemy.Column(_sqlalchemy.Float, nullable=True)
     precio_compra = _sqlalchemy.Column(_sqlalchemy.Float, nullable=True)
     sede = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)    
+    
     __mapper_args__ = {
-        "polymorphic_identity": "elemento",
-        "polymorphic_on": peso,
+        "polymorphic_identity": "elemento"
     }
 
     def insert(self):
@@ -73,7 +73,7 @@ class Libro(Elemento):
     nro_paginas = _sqlalchemy.Column(_sqlalchemy.Integer, nullable=True)
 
     __mapper_args__ = {
-        "polymorphic_identity": "libro",
+        "polymorphic_identity": "libro"
     }
 
     def insert(self):
@@ -92,7 +92,7 @@ class Juguete(Elemento):
     
     rango_edad = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     __mapper_args__ = {
-        "polymorphic_identity": "juguete",
+        "polymorphic_identity": "juguete"
     }
 
     def insert(self):
