@@ -79,12 +79,22 @@ async def generate_token(
 async def get_current_user(current_user = _fastapi.Depends(_services.get_current_user)):
     return current_user
 
+"""
+
+"""
+
 @app.get("/api/elementos")
 async def get_elementos(current_user = _fastapi.Depends(_services.get_current_user), db: _orm.Session = _fastapi.Depends(_database.get_db),
                         limit: int = 10, page: int = 1, search: str = ''):
     paging: int = (page - 1) * limit
     elementos =  db.query(_models.Elemento).group_by(_models.Elemento.uuid).limit(limit).offset(paging).all()
-    return {'status': 'success', 'results': len(elementos), 'Elementos': elementos}
+    elements = []
+    for row in elementos:         
+        elements.append(row.format())
+
+    return {'status': 'success', 'results': len(elements), 'Elementos': elements}
+
+
 
 
 # TEST ENDPOINTS
