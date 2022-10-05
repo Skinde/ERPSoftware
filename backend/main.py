@@ -1,3 +1,6 @@
+from csv import excel_tab
+from os import stat
+from xml.dom.minidom import Element
 import fastapi as _fastapi
 import fastapi.security as _security
 import json as _json
@@ -43,12 +46,14 @@ async def create_user(
     mongo_db: _pymongo.database.Database = _fastapi.Depends(_services.get_mongo_db)
 ):
     """Check if email already registered and register new user"""
-    old_user: dict = mongo_db["users"].find_one({"email": user.email})
-    
-    if old_user:
-        raise _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
-
     try:
+        if not _services.validate_email(user.email):
+            raise _fastapi.HTTPException(status_code=406, detail="invalid email")
+    
+        old_user: dict = mongo_db["users"].find_one({"email": user.email})
+        if old_user:
+            raise _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
+        
         user.password: str = _hash.bcrypt.hash(user.password)
         response: _pymongo.results.InsertOneResult = mongo_db["users"].insert_one(user.dict())
 
@@ -84,7 +89,7 @@ async def get_current_user(current_user = _fastapi.Depends(_services.get_current
 
 #   QUERY SERVICE
 @app.get("/api/elementos")
-async def get_elementos(
+async def get_elements(
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db),
     limit: int = 10, 
@@ -92,14 +97,70 @@ async def get_elementos(
     search: str = ''
 ):
     paging: int = (page - 1) * limit
-    elementos =  db.query(_models.Elemento).group_by(_models.Elemento.uuid).limit(limit).offset(paging).all()
 
-    elements = []
-    for row in elementos:         
-        elements.append(row.format())
+    try:
+        elementos =  db.query(_models.Elemento).group_by(_models.Elemento.uuid).limit(limit).offset(paging).all()
+        
+        elements = []
+        for row in elementos:         
+            elements.append(row.format())
+        
+        return {
+            'status': 'success', 
+            'results': len(elements),
+            'Elementos': elements
+        }
+    except Exception as e:
+        print(e)
 
-    return {'status': 'success', 'results': len(elements), 'Elementos': elements}
+# CREATE ENDPOINTS
+@app.post("/api/libros")
+async def add_books(
+    libro : _schemas._Libro,
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db)
+):
+    pass
 
+@app.post("/api/juguetes")
+async def add_toys(
+    juguete : _schemas._Juguete,
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db)
+):
+    try:
+        juguete = dict(juguete)
+
+        elemento = _schemas._Elemento(**juguete)
+        elemento_uuid = _models.Elemento(**dict(elemento)).insert()
+
+        juguete["uuid"] = elemento_uuid
+        juguete = _models.Juguete(**juguete)
+        juguete.insert()
+        
+        return {
+            "success": True,
+            "juguete": juguete
+        }
+    except Exception as e:
+        print(e)
+
+# QUERY ENDPOINTS
+@app.get("/api/libros")
+async def get_books(
+    libro : _schemas._Libro,
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db)
+):
+    pass
+
+@app.get("/api/juguetes")
+async def get_toys(
+    juguete : _schemas._Juguete,
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db)
+):
+    pass
 
 # TEST ENDPOINTS
 """ 
@@ -137,12 +198,9 @@ async def query_user(user_email):
 """
 
 """
-TASKS:
-- manage migrations with sqlalchemy
-
-SOURCES:
-https://stackoverflow.com/questions/3582552/what-is-the-format-for-the-postgresql-connection-string-url
-https://www.tutorialspoint.com/sqlalchemy/index.htm
+PSQL URI
+    https://stackoverflow.com/questions/3582552/what-is-the-format-for-the-postgresql-connection-string-url
+    https://www.tutorialspoint.com/sqlalchemy/index.htm
 
 TypeError: ObjectId('') is not JSON serializable
     https://stackoverflow.com/questions/16586180/typeerror-objectid-is-not-json-serializable
