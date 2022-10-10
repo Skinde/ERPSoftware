@@ -80,6 +80,7 @@ async def generate_token(
     response: dict = await _services.create_token(user)
     return response
 
+
 @app.get("/api/me")
 async def get_current_user(current_user = _fastapi.Depends(_services.get_current_user)):
     return current_user
