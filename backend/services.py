@@ -8,6 +8,7 @@ import os
 import passlib.hash as _hash
 import pymongo as _pymongo
 import re as _re
+import sqlalchemy.inspection as _sqlinspect
 import sqlalchemy.orm as _orm
 
 import mongo as _mongo
@@ -18,6 +19,7 @@ import schemas as _schemas
 oauth2_scheme = _security.OAuth2PasswordBearer(tokenUrl="/api/login")
 JWT_SECRET = os.environ.get("JWT_SECRET_KEY")
 
+# BASIC SERVICES
 def create_database():
     return _database.Base.metadata.create_all(bind=_database.engine)
 
@@ -34,7 +36,31 @@ def validate_email(email: str):
         return True
     return False
 
+# PSQL SERVICES
+def insert_on_db(obj):
+    session = _database.Session()
+    try:
+        session.add(obj)
+        session.commit()
 
+        pk = _sqlinspect.inspect(obj).identity
+        return pk
+    except Exception as e:
+        session.rollback()
+    finally:
+        session.close()
+
+def delete_on_db(obj):
+    session = _database.Session()
+    try:
+        session.delete(obj)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+    finally:
+        session.close()
+
+# API SERVICES
 async def get_current_user(
     mongo_db: _pymongo.database.Database = _fastapi.Depends(get_mongo_db),
     token: str = _fastapi.Depends(oauth2_scheme),
@@ -76,15 +102,3 @@ async def create_token(user: dict):
         "access_token": token,
         "token_type": "bearer"
     }
-
-"""
-https://www.simplilearn.com/tutorials/python-tutorial/yield-in-python
-https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do
-
-https://fastapi.tiangolo.com/python-types/
-https://pydantic-docs.helpmanual.io/
-https://fastapi.tiangolo.com/tutorial/security/
-
-DOCKER:
-    https://www.youtube.com/watch?v=NVvZNmfqg6M
-"""

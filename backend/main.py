@@ -45,11 +45,11 @@ async def create_user(
     """Check if email already registered and register new user"""
     try:
         if not _services.validate_email(user.email):
-            raise _fastapi.HTTPException(status_code=406, detail="invalid email")
+            return _fastapi.HTTPException(status_code=406, detail="invalid email")
     
         old_user: dict = mongo_db["users"].find_one({"email": user.email})
         if old_user:
-            raise _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
+            return _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
         
         user.password: str = _hash.bcrypt.hash(user.password)
         response: _pymongo.results.InsertOneResult = mongo_db["users"].insert_one(user.dict())
@@ -71,7 +71,7 @@ async def generate_token(
     user: dict = await _services.authenticate_user(form_data.username, form_data.password, mongo_db)
     
     if not user:
-        raise _fastapi.HTTPException(
+        return _fastapi.HTTPException(
             status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"}
@@ -131,28 +131,49 @@ async def add_books(
         print(e)
 
 @app.post("/api/juguetes")
-async def add_toys(
+async def add_toy(
     juguete : _schemas._Juguete,
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db)
 ):
+    """Insert a book in the database and return its identifier(uuid)"""
     try:
-        juguete = dict(juguete)
-        juguete = _models.Juguete(**juguete)
-        juguete_uuid = juguete.insert()
-        
+        db_response = db.query(_models.Juguete).filter_by(nombre=juguete.nombre).first()
+        if not db_response:
+            juguete.tipo = "juguete"
+            juguete = _models.Juguete(**dict(juguete))
+            juguete_response = juguete.insert()
+
+            if not juguete_response["success"]:
+                return _fastapi.HTTPException(
+                    status_code=500,
+                    detail=juguete_response,
+                    headers={"WWW-Authenticate": "Bearer"}
+                )
+        item_data = {
+            "nombre": juguete.nombre
+        }
+        new_item = _models.Inventario_juguete(**item_data)
+        item_uuid = new_item.insert()
         return {
-            "uuid": juguete_uuid,
             "success": True,
-            "juguete": juguete
+            "juguete": juguete,
+            "new item uuid": item_uuid
         }
     except Exception as e:
         print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 # QUERY ENDPOINTS
 @app.get("/api/libros")
 async def get_books(
-    #libro : _schemas._Libro,
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db),
     limit: int = 10, 
@@ -176,11 +197,8 @@ async def get_books(
     except Exception as e:
         print(e)
 
-    
-
 @app.get("/api/juguetes")
 async def get_toys(
-    #juguete : _schemas._Juguete,
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db),
     limit: int = 10, 
@@ -203,48 +221,3 @@ async def get_toys(
         }
     except Exception as e:
         print(e)
-    
-
-# TEST ENDPOINTS
-""" 
-@app.post("/try/users")
-async def sign_up(username: str, password: str):
-    mongo_db = _services.get_mongo_db()
-    collection = "users"
-    
-    del_response: _pymongo.results.DeleteResult = mongo_db[collection].delete_many({})
-    
-    response: _pymongo.results.InsertOneResult = mongo_db[collection].insert_one({
-        "username": username,
-        "password": _hash.pbkdf2_sha256.hash(password),
-    })
-
-    return {
-        "mongo_db": {
-            "success": response.acknowledged,
-            "inserted_id": str(response.inserted_id),
-            "del response": {
-                "success": response.acknowledged,
-                "deleted count": del_response.deleted_count
-            }
-        }
-    }
-
-@app.get("/try/users/{user_email}")
-async def query_user(user_email):
-    mongo_db = _services.get_mongo_db()
-    db_response: _pymongo.results.InsertOneResult = mongo_db["users"].find_one({"email": user_email})
-
-    return {
-        "mongo_db": { k:str(v) for k,v in db_response.items() }
-    }
-"""
-
-"""
-PSQL URI
-    https://stackoverflow.com/questions/3582552/what-is-the-format-for-the-postgresql-connection-string-url
-    https://www.tutorialspoint.com/sqlalchemy/index.htm
-
-TypeError: ObjectId('') is not JSON serializable
-    https://stackoverflow.com/questions/16586180/typeerror-objectid-is-not-json-serializable
-"""

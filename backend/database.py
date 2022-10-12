@@ -19,11 +19,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-"""
-SOURCE:
-    https://docs.sqlalchemy.org/en/14/orm/quickstart.html
-    https://docs.sqlalchemy.org/en/14/tutorial/engine.html
-    https://docs.sqlalchemy.org/en/14/orm/session_api.html#sqlalchemy.orm.Session
-    https://docs.sqlalchemy.org/en/14/orm/extensions/declarative/
-"""
