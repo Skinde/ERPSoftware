@@ -210,8 +210,7 @@ async def get_books(
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db),
     limit: int = 10, 
-    page: int = 1, 
-    search: str = ''
+    page: int = 1
 ):
     paging: int = (page - 1) * limit
 
@@ -243,9 +242,17 @@ async def get_toys(
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db),
     limit: int = 10, 
-    page: int = 1, 
-    search: str = ''
+    page: int = 1
 ):
+    if page < 0:
+        return _fastapi.HTTPException(
+            status_code=400,    # Bad request
+            detail={
+                "success": False,
+                "error type": "pagging not valid"
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
     paging: int = (page - 1) * limit
 
     try:
@@ -259,6 +266,52 @@ async def get_toys(
             'status': 'success', 
             'results': len(response),
             'Juguetes': response
+        }
+    except Exception as e:
+        print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+@app.get("/api/inventario_libros")
+async def get_inventario_libros(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+):
+    try:
+        db_response = db.query(_models.Inventario_libro).all()
+        return {
+            "success": True,
+            "#": len(db_response),
+            "Libros": [ins.__dict__ for ins in db_response]
+        }
+    except Exception as e:
+        print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+@app.get("/api/inventario_juguetes")
+async def get_inventario_juguetes(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+):
+    try:
+        db_response = db.query(_models.Inventario_juguete).all()
+        return {
+            "success": True,
+            "#": len(db_response),
+            "Juguetes": [ins.__dict__ for ins in db_response]
         }
     except Exception as e:
         print(e)

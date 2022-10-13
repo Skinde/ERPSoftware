@@ -29,3 +29,4 @@
 `main.py`
 - https://stackoverflow.com/questions/16586180/typeerror-objectid-is-not-json-serializable
 - https://docs.sqlalchemy.org/en/14/tutorial/data_insert.html
+- https://stackoverflow.com/questions/72395169/error-sqlalchemy-orm-exc-detachedinstanceerror-instance-user-at-0x102827910-i

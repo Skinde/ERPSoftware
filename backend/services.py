@@ -43,6 +43,7 @@ def insert_on_db(obj):
         session.add(obj)
         session.commit()
         session.refresh(obj)
+
         pk = _sqlinspect.inspect(obj).identity
         return {
             "success": True,
@@ -74,8 +75,19 @@ def delete_on_db(obj):
     try:
         session.delete(obj)
         session.commit()
+        
+        return {
+            "success": True
+        }
     except Exception as e:
         session.rollback()
+        return {
+            "success": False,
+            "error": {
+                "type": str(type(e.orig)),
+                "code": e.code
+            }
+        }
     finally:
         session.close()
 
