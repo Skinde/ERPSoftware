@@ -33,6 +33,8 @@ class _Elemento(_pydantic.BaseModel):
 
 # LIBRO
 class _Libro(_Elemento):
+    titulo: _typing.Optional[str] = ""
+    isbn: str
     autor: _typing.Optional[str] = ""
     idioma: _typing.Optional[str] = ""
     editorial: _typing.Optional[str] = ""
@@ -69,7 +71,7 @@ class _Inmueble(_Elemento):
 
 # ITEM LIBRO
 class _ItemLibro(_pydantic.BaseModel):
-    isbn: str
+    # isbn: str
     titulo: str
 
     estado: _typing.Optional[str] = ""
@@ -84,14 +86,13 @@ class _ItemLibro(_pydantic.BaseModel):
 
 # ITEM JUGUETE
 class _ItemJuguete(_pydantic.BaseModel):
-    uuid: str
     nombre: str
 
     estado: _typing.Optional[str] = ""
     sede: _typing.Optional[str] = ""
     precio_compra: _typing.Optional[float] = -1
     valor: _typing.Optional[float] = -1
-    fecha_adquisicion: _typing.Optional[_datetime.datetime] = _datetime.datetime.now
+    fecha_adquisicion: _typing.Optional[_datetime.datetime] = _datetime.datetime.now()
     fecha_caducidad: _typing.Optional[_datetime.datetime]
 
     class Config:

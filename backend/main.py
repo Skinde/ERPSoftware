@@ -81,7 +81,9 @@ async def generate_token(
     return response
 
 @app.get("/api/me")
-async def get_current_user(current_user = _fastapi.Depends(_services.get_current_user)):
+async def get_current_user(
+    current_user = _fastapi.Depends(_services.get_current_user)
+):
     return current_user
 
 #   QUERY SERVICE
@@ -111,38 +113,66 @@ async def get_elements(
         print(e)
 
 # CREATE ENDPOINTS
-@app.post("/api/libros")
-async def add_books(
+@app.post("/api/libros/insert_one")
+async def add_book(
     libro : _schemas._Libro,
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db)
 ):
+    """Insert a toy in the database and return its identifier(PK)"""
     try:
-        libro = dict(libro)
-        libro = _models.Libro(**libro)
-        libro_uuid = libro.insert()
+        libro.titulo = libro.nombre
+        db_response = db.query(_models.Libro).filter_by(titulo=libro.titulo).first()
+
+        if not db_response:
+            libro.tipo = "libro"
+            libro = _models.Libro(**dict(libro))
+            # libro_response = libro.insert()
+            libro_response = _services.insert_on_db(libro)
+
+            if not libro_response["success"]:
+                return _fastapi.HTTPException(
+                    status_code=500,
+                    detail=libro_response,
+                    headers={"WWW-Authenticate": "Bearer"}
+                )
+        item_data = {
+            "titulo": libro.titulo
+        }
+        new_item = _models.Inventario_libro(**item_data)
+        # insert_item_response = new_item.insert()
+        insert_item_response = _services.insert_on_db(new_item)
 
         return {
-            "uuid": libro_uuid,
             "success": True,
-            "libro": libro
+            "libro": libro,
+            "insert item response": insert_item_response
         }
     except Exception as e:
         print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
-@app.post("/api/juguetes")
+@app.post("/api/juguetes/insert_one")
 async def add_toy(
     juguete : _schemas._Juguete,
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db)
 ):
-    """Insert a book in the database and return its identifier(uuid)"""
+    """Insert a toy in the database and return its identifier(uuid)"""
     try:
         db_response = db.query(_models.Juguete).filter_by(nombre=juguete.nombre).first()
         if not db_response:
             juguete.tipo = "juguete"
             juguete = _models.Juguete(**dict(juguete))
-            juguete_response = juguete.insert()
+            # juguete_response = juguete.insert()
+            juguete_response = _services.insert_on_db(juguete)
 
             if not juguete_response["success"]:
                 return _fastapi.HTTPException(
@@ -150,15 +180,18 @@ async def add_toy(
                     detail=juguete_response,
                     headers={"WWW-Authenticate": "Bearer"}
                 )
+
         item_data = {
             "nombre": juguete.nombre
         }
         new_item = _models.Inventario_juguete(**item_data)
-        item_uuid = new_item.insert()
+        # insert_item_response = new_item.insert()
+        insert_item_response = _services.insert_on_db(new_item)
+
         return {
             "success": True,
             "juguete": juguete,
-            "new item uuid": item_uuid
+            "insert item response": insert_item_response
         }
     except Exception as e:
         print(e)
@@ -183,19 +216,27 @@ async def get_books(
     paging: int = (page - 1) * limit
 
     try:
-        elementos =  db.query(_models.Libro).limit(limit).offset(paging).all()
+        books =  db.query(_models.Libro).limit(limit).offset(paging).all()
         
-        elements = []
-        for row in elementos:         
-            elements.append(row.format())
+        response = []
+        for book in books:         
+            response.append(book.__dict__)
         
         return {
             'status': 'success', 
-            'results': len(elements),
-            'Libros': elements
+            'results': len(response),
+            'Libros': response
         }
     except Exception as e:
         print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 @app.get("/api/juguetes")
 async def get_toys(
@@ -208,16 +249,24 @@ async def get_toys(
     paging: int = (page - 1) * limit
 
     try:
-        elementos =  db.query(_models.Juguete).limit(limit).offset(paging).all()
+        juguetes =  db.query(_models.Juguete).limit(limit).offset(paging).all()
         
-        elements = []
-        for row in elementos:         
-            elements.append(row.format())
+        response = []
+        for juguete in juguetes:         
+            response.append(juguete.__dict__)
         
         return {
             'status': 'success', 
-            'results': len(elements),
-            'Juguetes': elements
+            'results': len(response),
+            'Juguetes': response
         }
     except Exception as e:
         print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )

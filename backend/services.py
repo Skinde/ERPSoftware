@@ -42,9 +42,28 @@ def insert_on_db(obj):
     try:
         session.add(obj)
         session.commit()
-
+        session.refresh(obj)
         pk = _sqlinspect.inspect(obj).identity
-        return pk
+        return {
+            "success": True,
+            "pk": pk
+        }
+    except Exception as e:
+        session.rollback()
+        return {
+            "success": False,
+            "error": {
+                "type": str(type(e.orig)),
+                "code": e.code
+            }
+        }
+    finally:
+        session.close()
+
+def update_on_db(obj):
+    session = _database.Session()
+    try:
+        session.commit()
     except Exception as e:
         session.rollback()
     finally:

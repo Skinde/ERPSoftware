@@ -1,7 +1,8 @@
 import datetime as _datetime
 import sqlalchemy as _sqlalchemy
-import sqlalchemy.orm as _orm
 import sqlalchemy.dialects.postgresql as _psql
+import sqlalchemy.inspection as _sqlinspect
+import sqlalchemy.orm as _orm
 import database as _database
 import uuid as _uuid
 
@@ -20,17 +21,28 @@ class Elemento(_database.Base):
         "polymorphic_on": tipo
     }
 
-    def insert(self):
-        session = _database.Session()
-        try:
-            session.add(self)
-            session.commit()
-
-            return self.nombre
-        except Exception as e:
-            session.rollback()
-        finally:
-            session.close()
+    # def insert(self):
+    #     session = _database.Session()
+    #     try:
+    #         session.add(self)
+    #         session.commit()
+    #         session.refresh(self)
+    #         pk = _sqlinspect.inspect(self).identity
+    #         return {
+    #             "success": True,
+    #             "pk": pk
+    #         }
+    #     except Exception as e:
+    #         session.rollback()
+    #         return {
+    #             "success": False,
+    #             "error": {
+    #                 "type": str(type(e.orig)),
+    #                 "code": e.code
+    #             }
+    #         }
+    #     finally:
+    #         session.close()
     
     def update(self):
         session = _database.Session()
@@ -57,7 +69,8 @@ class Elemento(_database.Base):
 class Libro(Elemento):
     __tablename__ = 'libro'
     titulo = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("elemento.nombre"), primary_key=True)
-    
+    isbn = _sqlalchemy.Column(_sqlalchemy.String, nullable=False)
+
     autor = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     idioma = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     editorial = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
@@ -73,17 +86,28 @@ class Libro(Elemento):
 
     inventario = _orm.relationship("Inventario_libro", back_populates="libro")
 
-    def insert(self):
-        session = _database.Session()
-        try:
-            session.add(self)
-            session.commit()
-
-            return self.titulo
-        except Exception as e:
-            session.rollback()
-        finally:
-            session.close()
+    # def insert(self):
+    #     session = _database.Session()
+    #     try:
+    #         session.add(self)
+    #         session.commit()
+    #         session.refresh(self)
+    #         pk = _sqlinspect.inspect(self).identity
+    #         return {
+    #             "success": True,
+    #             "pk": pk
+    #         }
+    #     except Exception as e:
+    #         session.rollback()
+    #         return {
+    #             "success": False,
+    #             "error": {
+    #                 "type": str(type(e.orig)),
+    #                 "code": e.code
+    #             }
+    #         }
+    #     finally:
+    #         session.close()
     
     def update(self):
         session = _database.Session()
@@ -123,27 +147,28 @@ class Juguete(Elemento):
 
     inventario = _orm.relationship("Inventario_juguete", back_populates="juguete")
 
-    def insert(self):
-        session = _database.Session()
-        try:
-            session.add(self)
-            session.commit()
-
-            return {
-                "success": True,
-                "pk": self.nombre
-            }
-        except Exception as e:
-            session.rollback()
-            return {
-                "success": False,
-                "error": {
-                    "type": str(type(e.orig)),
-                    "code": e.code
-                }
-            }
-        finally:
-            session.close()
+    # def insert(self):
+    #     session = _database.Session()
+    #     try:
+    #         session.add(self)
+    #         session.commit()
+    #         session.refresh(self)
+    #         pk = _sqlinspect.inspect(self).identity
+    #         return {
+    #             "success": True,
+    #             "pk": pk
+    #         }
+    #     except Exception as e:
+    #         session.rollback()
+    #         return {
+    #             "success": False,
+    #             "error": {
+    #                 "type": str(type(e.orig)),
+    #                 "code": e.code
+    #             }
+    #         }
+    #     finally:
+    #         session.close()
     
     def update(self):
         session = _database.Session()
@@ -178,17 +203,28 @@ class Inmueble(Elemento):
         "polymorphic_identity": "inmueble"
     }
 
-    def insert(self):
-        session = _database.Session()
-        try:
-            session.add(self)
-            session.commit()
-
-            return self.uuid
-        except Exception as e:
-            session.rollback()
-        finally:
-            session.close()
+    # def insert(self):
+    #     session = _database.Session()
+    #     try:
+    #         session.add(self)
+    #         session.commit()
+    #         session.refresh(self)
+    #         pk = _sqlinspect.inspect(self).identity
+    #         return {
+    #             "success": True,
+    #             "pk": pk
+    #         }
+    #     except Exception as e:
+    #         session.rollback()
+    #         return {
+    #             "success": False,
+    #             "error": {
+    #                 "type": str(type(e.orig)),
+    #                 "code": e.code
+    #             }
+    #         }
+    #     finally:
+    #         session.close()
     
     def update(self):
         session = _database.Session()
@@ -214,8 +250,8 @@ class Inmueble(Elemento):
 
 class Inventario_libro(_database.Base):
     __tablename__ = "inventario_libro"
-    isbn = _sqlalchemy.Column(_sqlalchemy.String, primary_key=True)
-    titulo = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("libro.titulo"))
+    uuid = _sqlalchemy.Column(_psql.UUID(as_uuid=True), primary_key=True, server_default=_sqlalchemy.text("md5(random()::text || clock_timestamp()::text)::uuid"))
+    titulo = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("libro.titulo"), unique=False)
     
     estado = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     sede = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
@@ -226,17 +262,28 @@ class Inventario_libro(_database.Base):
 
     libro = _orm.relationship("Libro", back_populates="inventario")
 
-    def insert(self):
-        session = _database.Session()
-        try:
-            session.add(self)
-            session.commit()
-
-            return self.titulo
-        except Exception as e:
-            session.rollback()
-        finally:
-            session.close()
+    # def insert(self):
+    #     session = _database.Session()
+    #     try:
+    #         session.add(self)
+    #         session.commit()
+    #         session.refresh(self)
+    #         pk = _sqlinspect.inspect(self).identity
+    #         return {
+    #             "success": True,
+    #             "pk": pk
+    #         }
+    #     except Exception as e:
+    #         session.rollback()
+    #         return {
+    #             "success": False,
+    #             "error": {
+    #                 "type": str(type(e.orig)),
+    #                 "code": e.code
+    #             }
+    #         }
+    #     finally:
+    #         session.close()
     
     def update(self):
         session = _database.Session()
@@ -258,12 +305,12 @@ class Inventario_libro(_database.Base):
             session.close()
 
     def __repr__(self) -> str:
-        return f"InventarioLibro({self.isbn} {self.estado} {self.valor} {self.fecha_adquisicion})"
+        return f"InventarioLibro({self.uuid} {self.estado} {self.valor} {self.fecha_adquisicion})"
 
 class Inventario_juguete(_database.Base):
     __tablename__ = "inventario_juguete"
     uuid = _sqlalchemy.Column(_psql.UUID(as_uuid=True), primary_key=True, server_default=_sqlalchemy.text("md5(random()::text || clock_timestamp()::text)::uuid"))
-    nombre = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("juguete.nombre"))
+    nombre = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("juguete.nombre"), unique=False)
 
     estado = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     sede = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
@@ -274,18 +321,29 @@ class Inventario_juguete(_database.Base):
 
     juguete = _orm.relationship("Juguete", back_populates="inventario")
 
-    def insert(self):
-        session = _database.Session()
-        try:
-            session.add(self)
-            session.commit()
-
-            return self.uuid
-        except Exception as e:
-            session.rollback()
-        finally:
-            session.close()
-    
+    # def insert(self):
+    #     session = _database.Session()
+    #     try:
+    #         session.add(self)
+    #         session.commit()
+    #         session.refresh(self)
+    #         pk = _sqlinspect.inspect(self).identity
+    #         return {
+    #             "success": True,
+    #             "pk": pk
+    #         }
+    #     except Exception as e:
+    #         session.rollback()
+    #         return {
+    #             "success": False,
+    #             "error": {
+    #                 "type": str(type(e.orig)),
+    #                 "code": e.code
+    #             }
+    #         }
+    #     finally:
+    #         session.close()
+        
     def update(self):
         session = _database.Session()
         try:
@@ -307,3 +365,4 @@ class Inventario_juguete(_database.Base):
 
     def __repr__(self) -> str:
         return f"InventarioJuguete ({self.item_id} {self.estado} {self.valor} {self.fecha_adquisicion})"
+

@@ -16,6 +16,7 @@
 - https://stackoverflow.com/questions/25932166/generic-way-to-get-primary-key-from-declaratively-defined-instance-in-sqlalchemy
 - https://stackoverflow.com/questions/24852083/sqlalchemy-non-trivial-one-to-one-relationship-with-multiple-tables
 - https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html#one-to-many
+- https://stackoverflow.com/questions/8253978/sqlalchemy-get-object-not-bound-to-a-session
 
 `database.py`
 - https://stackoverflow.com/questions/3582552/what-is-the-format-for-the-postgresql-connection-string-url
@@ -27,3 +28,4 @@
 
 `main.py`
 - https://stackoverflow.com/questions/16586180/typeerror-objectid-is-not-json-serializable
+- https://docs.sqlalchemy.org/en/14/tutorial/data_insert.html
