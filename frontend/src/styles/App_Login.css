@@ -4,14 +4,12 @@ body {
 
 .main_login_box {
     background-color: white;
-
     width: 440px;
     height: 790px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
     border-radius: 30px;
 }
 
