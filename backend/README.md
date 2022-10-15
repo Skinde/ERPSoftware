@@ -30,3 +30,15 @@
 - https://stackoverflow.com/questions/16586180/typeerror-objectid-is-not-json-serializable
 - https://docs.sqlalchemy.org/en/14/tutorial/data_insert.html
 - https://stackoverflow.com/questions/72395169/error-sqlalchemy-orm-exc-detachedinstanceerror-instance-user-at-0x102827910-i
+
+`book_api_consumer.py`
+
+- https://stackoverflow.com/questions/12943819/how-to-prettyprint-a-json-file
+- https://stackoverflow.com/questions/52102398/typeerror-byte-indices-must-be-integers-or-slices-not-str
+- https://stackoverflow.com/questions/42009202/how-to-call-a-async-function-contained-in-a-class
+- https://linuxhint.com/make-http-client-program-python/
+- https://www.digitalocean.com/community/tutorials/python-http-client-request-get-post
+
+`query service`
+- https://graphql.org/learn/
+- https://graphql.org/learn/queries/

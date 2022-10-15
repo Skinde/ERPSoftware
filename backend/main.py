@@ -4,6 +4,7 @@ import json as _json
 import passlib.hash as _hash
 import pymongo as _pymongo
 
+import book_api_consumer as _consumer
 import database as _database
 import schemas as _schemas
 import models as _models
@@ -125,6 +126,24 @@ async def add_book(
         db_response = db.query(_models.Libro).filter_by(titulo=libro.titulo).first()
 
         if not db_response:
+            response_API = await _consumer.queryBookAPI({
+                "isbn": libro.isbn
+            })
+            if response_API["success"]:
+                try:
+                    book_data = response_API["response"]["items"][0]
+                    print(_json.dumps(book_data, indent=4))
+                    print(type(book_data))
+
+                    libro.autor = " & ".join(book_data["volumeInfo"]["authors"])
+                    libro.nro_paginas = book_data["volumeInfo"]["pageCount"] 
+                    libro.formato = book_data["volumeInfo"]["printType"]
+                    libro.idioma = book_data["volumeInfo"]["language"]
+                    libro.fecha_publicacion = book_data["volumeInfo"]["publishedDate"]
+                    libro.editorial = book_data["volumeInfo"]["publisher"]
+                except Exception as e:
+                    print(e)
+
             libro.tipo = "libro"
             libro = _models.Libro(**dict(libro))
             # libro_response = libro.insert()
