@@ -1,5 +1,8 @@
 import fastapi as _fastapi
 import fastapi.security as _security
+from fastapi.middleware.cors import CORSMiddleware as _CORSMiddleware
+
+import json as _json
 import passlib.hash as _hash
 import pymongo as _pymongo
 
@@ -15,6 +18,15 @@ _services.create_database()
 
 # GLOBAL VARIABLES
 app = _fastapi.FastAPI()
+origins = ["http://localhost:3000"]
+app.add_middleware(
+    _CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/")
 async def root():
@@ -35,74 +47,174 @@ async def root():
     }
 
 # API ENDPOINTS
-@app.post("/api/users")
+#   LOGIN ENDPOINTS
+@app.post("/api/sign-up")
 async def create_user(
-    user: _schemas._UserCreate,
+    user: _schemas._UserCredentials,
     mongo_db: _pymongo.database.Database = _fastapi.Depends(_services.get_mongo_db)
 ):
-    old_user: dict = mongo_db["users"].find_one({"email": user.email})
-
-    if old_user:
-        raise _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
-
+    """Check if email already registered and register new user"""
     try:
-        user.password = _hash.pbkdf2_sha256.hash(user.password)
-
+        if not _services.validate_email(user.email):
+            raise _fastapi.HTTPException(status_code=406, detail="invalid email")
+    
+        old_user: dict = mongo_db["users"].find_one({"email": user.email})
+        if old_user:
+            raise _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
+        
+        user.password: str = _hash.bcrypt.hash(user.password)
         response: _pymongo.results.InsertOneResult = mongo_db["users"].insert_one(user.dict())
 
         return {
             "success": response.acknowledged,
+            "message": "User create successfully" if response.acknowledged else "Email already in use",
             "inserted_id": str(response.inserted_id)
         }
     except Exception as e:
         print(e)
 
-@app.post("/api/token")
+@app.post("/api/login")
 async def generate_token(
     form_data: _security.OAuth2PasswordRequestForm = _fastapi.Depends(),
     mongo_db:  _pymongo.database.Database = _fastapi.Depends(_services.get_mongo_db)
 ):
+    """Login user if exists in collection and return JWT"""
     user: dict = await _services.authenticate_user(form_data.username, form_data.password, mongo_db)
     
     if not user:
-        raise _fastapi.HTTPException(status_code=401, detail="Invalid Credentials")
+        raise _fastapi.HTTPException(
+            status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
     response: dict = await _services.create_token(user)
     return response
 
-
-@app.get("/api/users/me")
+@app.get("/api/me")
 async def get_current_user(current_user = _fastapi.Depends(_services.get_current_user)):
     return current_user
 
-# TEST ENDPOINTS
-@app.post("/try/users")
-async def sign_up(username: str, password: str):
-    # MONGO
-    mongo_db = _services.get_mongo_db()
-    
-    mongo_db["users"].delete_many({})
-    response = mongo_db["users"].insert_one({
-        "username": username,
-        "password": _hash.pbkdf2_sha256.hash(password)
-    })
+#   QUERY SERVICE
+@app.get("/api/elementos")
+async def get_elements(
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    limit: int = 10, 
+    page: int = 1, 
+    search: str = ''
+):
+    paging: int = (page - 1) * limit
 
-    return {
-        "mongo_db": {
-            "success": response.acknowledged,
-            "inserted_id": str(response.inserted_id)
+    try:
+        elementos =  db.query(_models.Elemento).group_by(_models.Elemento.uuid).limit(limit).offset(paging).all()
+        
+        elements = []
+        for row in elementos:         
+            elements.append(row.format())
+        
+        return {
+            'status': 'success', 
+            'results': len(elements),
+            'Elementos': elements
         }
-    }
+    except Exception as e:
+        print(e)
 
-@app.get("/try/users/{user_email}")
-async def query_user(user_email):
-    # MONGO
-    mongo_db = _services.get_mongo_db()
-    db_response = mongo_db["users"].find_one({"email": user_email})
+# CREATE ENDPOINTS
+@app.post("/api/libros")
+async def add_books(
+    libro : _schemas._Libro,
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db)
+):
+    try:
+        libro = dict(libro)
+        libro = _models.Libro(**libro)
+        libro_uuid = libro.insert()
 
-    return {
-        "mongo_db": { k:str(v) for k,v in db_response.items() }
-    }
+        return {
+            "uuid": libro_uuid,
+            "success": True,
+            "libro": libro
+        }
+    except Exception as e:
+        print(e)
+
+@app.post("/api/juguetes")
+async def add_toys(
+    juguete : _schemas._Juguete,
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db)
+):
+    try:
+        juguete = dict(juguete)
+        juguete = _models.Juguete(**juguete)
+        juguete_uuid = juguete.insert()
+        
+        return {
+            "uuid": juguete_uuid,
+            "success": True,
+            "juguete": juguete
+        }
+    except Exception as e:
+        print(e)
+
+# QUERY ENDPOINTS
+@app.get("/api/libros")
+async def get_books(
+    #libro : _schemas._Libro,
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    limit: int = 10, 
+    page: int = 1, 
+    search: str = ''
+):
+    paging: int = (page - 1) * limit
+
+    try:
+        elementos =  db.query(_models.Libro).limit(limit).offset(paging).all()
+        
+        elements = []
+        for row in elementos:         
+            elements.append(row.format())
+        
+        return {
+            'status': 'success', 
+            'results': len(elements),
+            'Libros': elements
+        }
+    except Exception as e:
+        print(e)
+
+    
+
+@app.get("/api/juguetes")
+async def get_toys(
+    #juguete : _schemas._Juguete,
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    limit: int = 10, 
+    page: int = 1, 
+    search: str = ''
+):
+    paging: int = (page - 1) * limit
+
+    try:
+        elementos =  db.query(_models.Juguete).limit(limit).offset(paging).all()
+        
+        elements = []
+        for row in elementos:         
+            elements.append(row.format())
+        
+        return {
+            'status': 'success', 
+            'results': len(elements),
+            'Juguetes': elements
+        }
+    except Exception as e:
+        print(e)
+    
 
 """
 TASKS:

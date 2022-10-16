@@ -7,6 +7,7 @@ import fastapi.security as _security
 import os
 import passlib.hash as _hash
 import pymongo as _pymongo
+import re as _re
 import sqlalchemy.orm as _orm
 
 import mongo as _mongo
@@ -14,7 +15,7 @@ import database as _database
 import models as _models
 import schemas as _schemas
 
-oauth2_scheme = _security.OAuth2PasswordBearer(tokenUrl="/api/token")
+oauth2_scheme = _security.OAuth2PasswordBearer(tokenUrl="/api/login")
 JWT_SECRET = os.environ.get("JWT_SECRET_KEY")
 
 def create_database():
@@ -26,10 +27,19 @@ def get_mongo_db():
 def get_mongo_client():
     return _mongo.client
 
+def validate_email(email: str):
+    email_regex = "^[a-zA-Z0-9-_.]+@[a-zA-Z0-9]+(\.[a-z]{1,3})+$"
+    
+    if _re.match(email_regex, email):
+        return True
+    return False
+
+
 async def get_current_user(
     mongo_db: _pymongo.database.Database = _fastapi.Depends(get_mongo_db),
     token: str = _fastapi.Depends(oauth2_scheme),
 ):
+    """Get email and password of current user if it is logged in"""
     collection = "users"
     try:
         payload: dict = _jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
@@ -39,24 +49,26 @@ async def get_current_user(
             status_code=401, detail="Invalid Email or Password"
         )
 
-    return _schemas._UserCreate(**user)
+    return _schemas._UserCredentials(**user)
 
 async def authenticate_user(
-    username: str, 
+    user_email: str, 
     password: str, 
     mongo_db: _pymongo.database.Database
 ):
+    """Check if user exists in collection and return it"""
     collection = "users"
-    user: dict = mongo_db[collection].find_one({"email": username})
+    user: dict = mongo_db[collection].find_one({"email": user_email})
 
     if not user:
         return False
-    if not _hash.pbkdf2_sha256.verify(password, user["password"]):
+    if not _hash.bcrypt.verify(password, user["password"]):
         return False
 
     return user
 
 async def create_token(user: dict):
+    """Create a JWT based on user email and return it"""
     user_obj = _schemas._UserBase(**user)
     token: str = _jwt.encode(user_obj.dict(), JWT_SECRET)
 
