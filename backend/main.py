@@ -1,5 +1,7 @@
 import fastapi as _fastapi
 import fastapi.security as _security
+from fastapi.middleware.cors import CORSMiddleware as _CORSMiddleware
+
 import json as _json
 import passlib.hash as _hash
 import pymongo as _pymongo
@@ -17,6 +19,15 @@ _services.create_database()
 
 # GLOBAL VARIABLES
 app = _fastapi.FastAPI()
+origins = ["http://localhost:3000"]
+app.add_middleware(
+    _CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/")
 async def root():

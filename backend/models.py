@@ -83,6 +83,19 @@ class Libro(Elemento):
     __mapper_args__ = {
         "polymorphic_identity": "libro"
     }
+    def format(self):
+        return {
+            'uuid': self.uuid,
+            'titulo': self.titulo,
+            'isbn': self.isbn,
+            'autor': self.autor,
+            'genero': self.genero,
+            'edicion': self.edicion,                   
+            'editorial': self.editorial,                                         
+            'idioma': self.idioma,                                         
+            'fecha_publicacion': self.fecha_publicacion,                                         
+            'nro_paginas': self.nro_paginas,                                         
+        }
 
     inventario = _orm.relationship("Inventario_libro", back_populates="libro")
 
@@ -202,6 +215,12 @@ class Inmueble(Elemento):
     __mapper_args__ = {
         "polymorphic_identity": "inmueble"
     }
+    def format(self):
+        return {
+            'uuid': self.uuid,
+            'nombre': self.nombre,
+            'rango_edad': self.rango_edad,
+        }
 
     # def insert(self):
     #     session = _database.Session()
