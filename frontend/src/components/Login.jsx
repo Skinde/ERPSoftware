@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useContext } from "react";
-import { UserContext} from "../context/UserContext"; 
+import { UserContext, cookies} from "../context/UserContext"; 
 import './../styles/App_Login.css';
 
 const logo_style = { marginTop: '25px' }
@@ -29,7 +29,8 @@ const Login = () => {
             );
 
             if (!response.ok){
-                throw new Error(response.statusText);
+                cookies.remove("user_Token");
+                //throw new Error(response.statusText);
             } else {
                 const data = await response.json(); 
                 console.log(data.access_token);

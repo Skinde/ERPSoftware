@@ -21,6 +21,7 @@ export const UserProvider = (props) => {
             if (!response.ok) {
                 setToken(null);
             }
+            console.log(response.json());
             cookies.set("user_Token", token);
         };
         fetchUser();
