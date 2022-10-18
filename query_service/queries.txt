@@ -1,0 +1,34 @@
+{
+  getBooks {
+    uuid
+    titulo
+  },
+  getToys(token: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImplcmVteS5tYXRvc0B1dGVjLmVkdS5wZSJ9.pZLvjNULvc9eZloZasJCyGO-mhqiN6Y-qWCbbK8j82E") {
+    uuid
+    nombre
+  }
+}
+
+{
+  libros_filter(filter: "{\"titulo\": \"algorithms\"}"){
+    titulo
+  }
+}	
+
+
+{
+  libros_filter(filter: "{\"titulo\": \"bob\"}"){
+    titulo
+  }
+}	
+
+{
+  item_libro {
+    uuid
+    titulo
+    fecha_adquisicion
+  },
+  libros_filter(filter: "{\"titulo\": \"Algorithms\"}"){
+    titulo
+  }
+}	
