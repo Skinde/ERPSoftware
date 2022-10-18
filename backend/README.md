@@ -42,3 +42,14 @@
 `query service`
 - https://graphql.org/learn/
 - https://graphql.org/learn/queries/
+- https://stackoverflow.com/questions/44617825/passing-headers-with-axios-post-request
+
+`migrations`
+- https://www.youtube.com/watch?v=KVb-TScnue0
+- https://www.youtube.com/watch?v=SdcH6IEi6nE
+
+`git`
+- https://stackoverflow.com/questions/12147360/git-branch-d-gives-warning
+- https://stackoverflow.com/questions/36984371/your-configuration-specifies-to-merge-with-the-branch-name-from-the-remote-bu\
+- https://stackoverflow.com/questions/35941566/git-says-remote-ref-does-not-exist-when-i-delete-remote-branch
+- https://askubuntu.com/questions/134997/how-to-change-folders-color
