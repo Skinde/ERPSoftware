@@ -3,7 +3,7 @@ import './../styles/Main_page.css';
 import { useNavigate } from "react-router-dom";
 
 const l_icon_style = {marginTop: '6px'}
-const l_icon = require('./../icon_logo.png');
+const l_icon = require('./../oficial_icon.png');
 
 const MainPage = () => {
 
