@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useContext } from "react";
 import { UserContext} from "../context/UserContext"; 
 import './../styles/App_Login.css';
+import { useNavigate } from "react-router-dom";
 
 const logo_style = { marginTop: '25px' }
 const logo = require('./../oficial_logo.png');
@@ -42,7 +43,13 @@ const Login = () => {
 
 
 
-
+    const navigate = useNavigate();
+    const handleClickSignIn = (e) => {
+        //if (isEmpty(validate(formValues))) {
+            navigate("/Home");
+        //}
+    }
+    
     const handleSubmit = (e) => {
         e.preventDefault();
         //setFormErrors(validate(formValues));
@@ -52,7 +59,7 @@ const Login = () => {
             submitLogin();
         //}
     };
-/*
+    /*
     useEffect(() => {
         console.log(formErrors);
         if (Object.keys(formErrors).length === 0 && isSubmit) {
@@ -88,7 +95,7 @@ const Login = () => {
     
             <header>Employee Login</header>
             
-            <form method="post" onSubmit={handleSubmit} name="theForm">
+            <form onSubmit={handleSubmit} name="theForm">
                 <div className="ui form">
                     <div className="txt_field">
                         <input class="input_e" type="text" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
@@ -103,7 +110,7 @@ const Login = () => {
                     
                 </div>
                 
-                <input type="submit" value="Login" />
+                <input type="submit" value="Login" onClick={handleClickSignIn}/>
             </form>
         </div>
         )
