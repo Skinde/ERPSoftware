@@ -1,0 +1,52 @@
+type Libro {
+    titulo: String
+    isbn: String
+    autor: String
+    idioma: String
+    editorial: String
+    formato: String
+    fecha_publicacion: String
+    genero: String
+    edicion: String
+    nro_paginas: Int
+}
+
+type Juguete {
+    nombre: String
+    tema: String
+    material_principal: String
+    fuente_energia: String
+    modo_juego: String
+    publico_objetivo: String
+}
+
+type Item_Juguete {
+    uuid: ID
+    nombre: String
+    estado: String
+    sede: String
+    precio_compra: Float
+    valor: Float
+    fecha_adquisicion: String
+    fecha_caducidad: String
+}
+
+type Item_Libro {
+    uuid: String
+    titulo: String
+    estado: String
+    sede: String
+    precio_compra: Float
+    valor: Float
+    fecha_adquisicion: String
+    fecha_caducidad: String
+}
+
+type Query {
+    test: String
+    libros: [Libro]
+    libros_filter(filter: String!): [Libro]
+    juguetes: [Juguete]
+    item_libro: [Item_Libro]
+    item_juguete: [Item_Juguete]
+}

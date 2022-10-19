@@ -1,9 +1,12 @@
 import fastapi as _fastapi
 import fastapi.security as _security
+from fastapi.middleware.cors import CORSMiddleware as _CORSMiddleware
+
 import json as _json
 import passlib.hash as _hash
 import pymongo as _pymongo
 
+import book_api_consumer as _consumer
 import database as _database
 import schemas as _schemas
 import models as _models
@@ -16,6 +19,15 @@ _services.create_database()
 
 # GLOBAL VARIABLES
 app = _fastapi.FastAPI()
+origins = ["http://localhost:3000"]
+app.add_middleware(
+    _CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/")
 async def root():
@@ -45,11 +57,11 @@ async def create_user(
     """Check if email already registered and register new user"""
     try:
         if not _services.validate_email(user.email):
-            raise _fastapi.HTTPException(status_code=406, detail="invalid email")
+            return _fastapi.HTTPException(status_code=406, detail="invalid email")
     
         old_user: dict = mongo_db["users"].find_one({"email": user.email})
         if old_user:
-            raise _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
+            return _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
         
         user.password: str = _hash.bcrypt.hash(user.password)
         response: _pymongo.results.InsertOneResult = mongo_db["users"].insert_one(user.dict())
@@ -71,7 +83,7 @@ async def generate_token(
     user: dict = await _services.authenticate_user(form_data.username, form_data.password, mongo_db)
     
     if not user:
-        raise _fastapi.HTTPException(
+        return _fastapi.HTTPException(
             status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"}
@@ -82,7 +94,9 @@ async def generate_token(
 
 
 @app.get("/api/me")
-async def get_current_user(current_user = _fastapi.Depends(_services.get_current_user)):
+async def get_current_user(
+    current_user = _fastapi.Depends(_services.get_current_user)
+):
     return current_user
 
 #   QUERY SERVICE
@@ -112,140 +126,231 @@ async def get_elements(
         print(e)
 
 # CREATE ENDPOINTS
-@app.post("/api/libros")
-async def add_books(
+@app.post("/api/libros/insert_one")
+async def add_book(
     libro : _schemas._Libro,
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db)
 ):
+    """Insert a toy in the database and return its identifier(PK)"""
     try:
-        libro = dict(libro)
-        libro = _models.Libro(**libro)
-        libro_uuid = libro.insert()
+        libro.titulo = libro.nombre
+        db_response = db.query(_models.Libro).filter_by(titulo=libro.titulo).first()
+
+        if not db_response:
+            response_API = await _consumer.queryBookAPI({
+                "isbn": libro.isbn
+            })
+            if response_API["success"]:
+                try:
+                    book_data = response_API["response"]["items"][0]
+                    print(_json.dumps(book_data, indent=4))
+                    print(type(book_data))
+
+                    libro.autor = " & ".join(book_data["volumeInfo"]["authors"])
+                    libro.nro_paginas = book_data["volumeInfo"]["pageCount"] 
+                    libro.formato = book_data["volumeInfo"]["printType"]
+                    libro.idioma = book_data["volumeInfo"]["language"]
+                    libro.fecha_publicacion = book_data["volumeInfo"]["publishedDate"]
+                    libro.editorial = book_data["volumeInfo"]["publisher"]
+                except Exception as e:
+                    print(e)
+
+            libro.tipo = "libro"
+            libro = _models.Libro(**dict(libro))
+            # libro_response = libro.insert()
+            libro_response = _services.insert_on_db(libro)
+
+            if not libro_response["success"]:
+                return _fastapi.HTTPException(
+                    status_code=500,
+                    detail=libro_response,
+                    headers={"WWW-Authenticate": "Bearer"}
+                )
+        item_data = {
+            "titulo": libro.titulo
+        }
+        new_item = _models.Inventario_libro(**item_data)
+        # insert_item_response = new_item.insert()
+        insert_item_response = _services.insert_on_db(new_item)
 
         return {
-            "uuid": libro_uuid,
             "success": True,
-            "libro": libro
+            "libro": libro,
+            "insert item response": insert_item_response
         }
     except Exception as e:
         print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
-@app.post("/api/juguetes")
-async def add_toys(
+@app.post("/api/juguetes/insert_one")
+async def add_toy(
     juguete : _schemas._Juguete,
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db)
 ):
+    """Insert a toy in the database and return its identifier(uuid)"""
     try:
-        juguete = dict(juguete)
-        juguete = _models.Juguete(**juguete)
-        juguete_uuid = juguete.insert()
-        
+        db_response = db.query(_models.Juguete).filter_by(nombre=juguete.nombre).first()
+        if not db_response:
+            juguete.tipo = "juguete"
+            juguete = _models.Juguete(**dict(juguete))
+            # juguete_response = juguete.insert()
+            juguete_response = _services.insert_on_db(juguete)
+
+            if not juguete_response["success"]:
+                return _fastapi.HTTPException(
+                    status_code=500,
+                    detail=juguete_response,
+                    headers={"WWW-Authenticate": "Bearer"}
+                )
+
+        item_data = {
+            "nombre": juguete.nombre
+        }
+        new_item = _models.Inventario_juguete(**item_data)
+        # insert_item_response = new_item.insert()
+        insert_item_response = _services.insert_on_db(new_item)
+
         return {
-            "uuid": juguete_uuid,
             "success": True,
-            "juguete": juguete
+            "juguete": juguete,
+            "insert item response": insert_item_response
         }
     except Exception as e:
         print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 # QUERY ENDPOINTS
 @app.get("/api/libros")
 async def get_books(
-    #libro : _schemas._Libro,
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db),
     limit: int = 10, 
-    page: int = 1, 
-    search: str = ''
+    page: int = 1
 ):
     paging: int = (page - 1) * limit
 
     try:
-        elementos =  db.query(_models.Libro).limit(limit).offset(paging).all()
+        books =  db.query(_models.Libro).limit(limit).offset(paging).all()
         
-        elements = []
-        for row in elementos:         
-            elements.append(row.format())
+        response = []
+        for book in books:         
+            response.append(book.__dict__)
         
         return {
             'status': 'success', 
-            'results': len(elements),
-            'Libros': elements
+            'results': len(response),
+            'Libros': response
         }
     except Exception as e:
         print(e)
-
-    
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 @app.get("/api/juguetes")
 async def get_toys(
-    #juguete : _schemas._Juguete,
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db),
     limit: int = 10, 
-    page: int = 1, 
-    search: str = ''
+    page: int = 1
 ):
+    if page < 0:
+        return _fastapi.HTTPException(
+            status_code=400,    # Bad request
+            detail={
+                "success": False,
+                "error type": "pagging not valid"
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
     paging: int = (page - 1) * limit
 
     try:
-        elementos =  db.query(_models.Juguete).limit(limit).offset(paging).all()
+        juguetes =  db.query(_models.Juguete).limit(limit).offset(paging).all()
         
-        elements = []
-        for row in elementos:         
-            elements.append(row.format())
+        response = []
+        for juguete in juguetes:         
+            response.append(juguete.__dict__)
         
         return {
             'status': 'success', 
-            'results': len(elements),
-            'Juguetes': elements
+            'results': len(response),
+            'Juguetes': response
         }
     except Exception as e:
         print(e)
-    
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
-# TEST ENDPOINTS
-""" 
-@app.post("/try/users")
-async def sign_up(username: str, password: str):
-    mongo_db = _services.get_mongo_db()
-    collection = "users"
-    
-    del_response: _pymongo.results.DeleteResult = mongo_db[collection].delete_many({})
-    
-    response: _pymongo.results.InsertOneResult = mongo_db[collection].insert_one({
-        "username": username,
-        "password": _hash.pbkdf2_sha256.hash(password),
-    })
-
-    return {
-        "mongo_db": {
-            "success": response.acknowledged,
-            "inserted_id": str(response.inserted_id),
-            "del response": {
-                "success": response.acknowledged,
-                "deleted count": del_response.deleted_count
-            }
+@app.get("/api/inventario_libros")
+async def get_inventario_libros(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+):
+    try:
+        db_response = db.query(_models.Inventario_libro).all()
+        return {
+            "success": True,
+            "#": len(db_response),
+            "Libros": [ins.__dict__ for ins in db_response]
         }
-    }
+    except Exception as e:
+        print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
-@app.get("/try/users/{user_email}")
-async def query_user(user_email):
-    mongo_db = _services.get_mongo_db()
-    db_response: _pymongo.results.InsertOneResult = mongo_db["users"].find_one({"email": user_email})
-
-    return {
-        "mongo_db": { k:str(v) for k,v in db_response.items() }
-    }
-"""
-
-"""
-PSQL URI
-    https://stackoverflow.com/questions/3582552/what-is-the-format-for-the-postgresql-connection-string-url
-    https://www.tutorialspoint.com/sqlalchemy/index.htm
-
-TypeError: ObjectId('') is not JSON serializable
-    https://stackoverflow.com/questions/16586180/typeerror-objectid-is-not-json-serializable
-"""
+@app.get("/api/inventario_juguetes")
+async def get_inventario_juguetes(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+):
+    try:
+        db_response = db.query(_models.Inventario_juguete).all()
+        return {
+            "success": True,
+            "#": len(db_response),
+            "Juguetes": [ins.__dict__ for ins in db_response]
+        }
+    except Exception as e:
+        print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
