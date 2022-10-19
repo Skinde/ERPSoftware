@@ -105,8 +105,7 @@ async def get_elements(
     current_user = _fastapi.Depends(_services.get_current_user), 
     db: _orm.Session = _fastapi.Depends(_database.get_db),
     limit: int = 10, 
-    page: int = 1, 
-    search: str = ''
+    page: int = 1,     
 ):
     paging: int = (page - 1) * limit
 

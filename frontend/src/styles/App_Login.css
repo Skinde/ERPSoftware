@@ -1,6 +1,4 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap');
-
 
 * {
     margin: 0;
@@ -83,7 +81,7 @@ input[type="password"] {
 /* Empty fields errors */
 .error {
     color: #d23f2f;
-    margin-top: -20px;
+    margin-top: 5px;
     padding-bottom: 10px;
 }
 /* ------------------- */
