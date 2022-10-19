@@ -8,9 +8,7 @@ const app = express();
 app.use(express.json());
 app.set('port', process.env.PORT || 8002);
 
-function isNumeric(value) {
-    return /(\d+(?:\.\d+)?)/.test(value);
-}
+const isNumeric = (value) => /(\d+(?:\.\d+)?)/.test(value);
 
 app.get('/', async (req, res) => {
     console.log(req.body);
