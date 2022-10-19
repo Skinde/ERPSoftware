@@ -2,14 +2,46 @@ import React, { useContext } from "react";
 import './../styles/Main_page.css';
 import { useNavigate } from "react-router-dom";
 import { UserContext, _cookies } from "../context/UserContext";
+import {ApolloClient, HttpLink, gql, InMemoryCache} from "@apollo/client";
 
 
+const client = new ApolloClient({
+    cache: new InMemoryCache(),
+    link: new HttpLink({
+        uri : 'http://localhost:4000'
+    })
+})
+
+const query = gql`
+{
+    libros{
+      titulo
+      isbn
+      autor
+    }
+      juguetes {
+      nombre
+      modo_juego
+    }
+    item_libro{
+      uuid
+      titulo
+      sede
+      valor
+    }
+    item_juguete {
+      uuid
+      nombre
+    }
+}
+`
 
 const l_icon_style = {marginTop: '6px'}
 const l_icon = require('./../oficial_icon.png');
 
 const MainPage = () => {
     const [token] = useContext(UserContext);
+
     const navigate = useNavigate();
     const get_elementos = async () => {
         const requestOptions ={
@@ -19,12 +51,17 @@ const MainPage = () => {
                 Authorization: "Bearer " + token,
             },            
         };
-        const response =  (await fetch("http://localhost:8000/api/elementos?limit=10&page=1", requestOptions)
-            );
-        console.log(response.json());
+        //const response =  (await fetch("http://localhost:8000/api/elementos?limit=10&page=1", requestOptions)
+          //  );
+        //console.log(response.json());
     }
     
+    
+    const handlequery = (e) =>{ 
+        e.preventDefault();
 
+        client.query({query}).then( res => {console.log(res.data)});
+    }
 
     const handleClickLogOut = (e) => { 
         _cookies.remove("user_Token");
@@ -72,7 +109,7 @@ const MainPage = () => {
                     <input type="text" placeholder="ISBN"/>
                 </div>
 
-                <input type="submit" value="Search" onClick={get_elementos}/>
+                <input type="submit" value="Search" onClick={handlequery}/>
             </form>
 
             <div class="Results-Wrapper">

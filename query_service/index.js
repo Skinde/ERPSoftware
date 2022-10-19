@@ -2,14 +2,19 @@ const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
 const axios = require('axios');
 const dotenv = require('dotenv');
+const cors = require('cors');
 dotenv.config();
 
 const express = require('express');
 const fs = require("fs");
 
 const app = express();
-
-app.set('port', process.env.PORT || 3000);
+app.use(
+    cors(
+        {origin: "http://localhost:3000"}
+    )
+)
+app.set('port', process.env.PORT || 4000);
 
 const typeDefs = buildSchema(fs.readFileSync('./schema.graphql').toString());
 const { resolvers } = require('./resolver.js');
