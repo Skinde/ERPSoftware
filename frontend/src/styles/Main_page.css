@@ -17,8 +17,8 @@ body {
 
 /* Wrapper Box */
 .wrapper {
-    width: 1200px;
-    height: 800px;
+    width: 1500px;
+    height: 825px;
     padding: 40px 30px 50px 30px;
     text-align: center;
 
@@ -29,97 +29,135 @@ body {
 
 /* Image wrapper*/
 .image_wrapper {
-    height: 725px;
     float: left;
-    align-items: center;
+    height: 220px;
+
     padding: 5px 15px;
 }
 .side_image {
-    margin-top: 26.5px;
+    margin-top: -5px;
 }
 
 .logout-button {
     width: 100%;
     height: 30px;
-    margin-top: 500px;
+    margin-top: 10px;
 
-    border-radius: 15px;
+    border-radius: 5px;
+    border-width: 1.5px;
     color: white;
-    background-color: #E53935;
+    background-color: #d23f2f;
+}
+
+/* Form - field */
+/* possible margin-top */
+.all-inputs {
+    width: 1290px;
+    height: 200px;
+
+    margin-left: 150px;
 }
 
 /* Inputs styles - First row */
 .first-row {
-    margin-top: 20px;
+    width: 1290px;
+    height: 70px;
 }
 .first-row select {
     float: left;
-    width: 250px;
+    width: 290px;
 
+    border-radius: 10px;
     padding: 5px;
-    margin-left: 15px;
+    margin-top: 15px;
+    margin-left: 30px;
 }
 .first-row input {
     float: left;
-    width: 250px;
+    width: 290px;
 
+    border-radius: 10px;
+    border-width: 1px;
     padding: 5px;
-    margin-left: 100px;
+    margin-top: 15px;
+    margin-left: 170px;
 }
 
-/* Inputs styles - Second Row */
+/* Input styles - Second row */
 .second-row {
-    margin-top: 20px;
+    width: 1290px;
+    height: 70px;
 }
 .second-row input {
     float: left;
-    width: 250px;
+    width: 290px;
 
+    border-radius: 10px;
+    border-width: 1px;
     padding: 5px;
-    margin-left: 15px;
-    margin-right: 85px;
-    margin-top: 30px;
+    margin-top: 15px;
+    margin-left: 30px;
+    margin-right: 140px;
 }
 .second-row select {
     float: left;
-    width: 250px;
-
+    width: 290px;
+    
+    border-radius: 10px;
     padding: 5px;
-    margin-left: 15px;
-    margin-top: 30px;
+    margin-top: 15px;
+    margin-left: 30px;
 }
 
-/* Inputs styles - Third Row */
+/* Input styles - Thid row */
 .third-row {
-    margin-top: 20px;
+    width: 1290px;
+    height: 70px;
 }
 .third-row input {
     float: left;
-    width: 250px;
+    width: 290px;
 
+    border-radius: 10px;
+    border-width: 1px;
     padding: 5px;
-    margin-left: 15px;
-    margin-right: 85px;
-    margin-top: 30px;
+    margin-top: 15px;
+    margin-left: 30px;
+    margin-right: 140px;
 }
 
 /* Botton submit -  Search */
 .all-inputs input[type="submit"] {
-    width: 22.5%;
+    float: left;
+    width: 290px;
 
-    border-radius: 15px;
-    padding: 5px;
-    margin-top: 25px;
+    border-radius: 30px;
+    padding: 2.5px;
+    margin-top: -60px;
+    margin-left: 950px;
+
     background-color: #03256C;
 }
 
 /* Results wrapper */
-.wrapper .Results-Wrapper {
-    width: 83.5%;
-    height: 480px;
-    margin-top: 30px;
-    margin-left: 170px;
+.Results-Wrapper {
+    width: 100%;
+    height: 60vh;
+
+    border-radius: 15px;
+    margin-top: 10px;
 
     background-color: #D9D9D9;
+}
+
+.Results-Wrapper .For-table {
+    width: 72.5%;
+    height: 52.5vh;
+
     border-radius: 15px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -30%);
 }
