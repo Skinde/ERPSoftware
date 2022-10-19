@@ -21,7 +21,7 @@ const { resolvers } = require('./resolver.js');
 
 // ENDPOINTS
 app.get('/', async (req, res) => {
-    const api_res = await axios.get(process.env.API_HOST + "/",)
+    const api_res = await axios.get(process.env.API_HOST + "/")
         .then(res => res.data)
         .catch(err => {
             console.log(err);

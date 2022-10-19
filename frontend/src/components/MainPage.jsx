@@ -2,73 +2,80 @@ import React, { useContext } from "react";
 import './../styles/Main_page.css';
 import { useNavigate } from "react-router-dom";
 import { UserContext, _cookies } from "../context/UserContext";
-import {ApolloClient, HttpLink, gql, InMemoryCache} from "@apollo/client";
+import axios from "axios";
 
-
-const client = new ApolloClient({
-    cache: new InMemoryCache(),
-    link: new HttpLink({
-        uri : 'http://localhost:4000'
-    })
-})
-
-const query = gql`
-{
-    libros{
-      titulo
-      isbn
-      autor
-    }
-      juguetes {
-      nombre
-      modo_juego
-    }
-    item_libro{
-      uuid
-      titulo
-      sede
-      valor
-    }
-    item_juguete {
-      uuid
-      nombre
-    }
-}
-`
 
 const l_icon_style = {marginTop: '6px'}
 const l_icon = require('./../oficial_icon.png');
-
 const MainPage = () => {
     const [token] = useContext(UserContext);
 
     const navigate = useNavigate();
     const get_elementos = async () => {
-        const requestOptions ={
-            method: "GET",                
-            headers: {
-                "accept": "application/json",
-                Authorization: "Bearer " + token,
-            },            
-        };
-        //const response =  (await fetch("http://localhost:8000/api/elementos?limit=10&page=1", requestOptions)
-          //  );
-        //console.log(response.json());
+        const response =  await axios.post(
+            'http://127.0.0.1:4000/graphql', 
+            {
+                query: `
+                {
+                    item_juguete { 
+                        uuid 
+                        nombre 
+                    },
+                    libros {
+                        titulo
+                        isbn
+                    },
+                    item_libro {
+                        uuid
+                        titulo
+                        sede
+                        valor
+                    },
+                    juguetes {
+                        nombre
+                        modo_juego
+                    }
+                }
+                `, variables: {
+                    filtro: "{ \"titulo\": \"algorithms\"}"
+                }
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: "Bearer " + token,
+                }
+            }
+        )
+        .then(res => res.data)
+        .catch(err => console.log(err));
+        console.log(response.data);
+        let placeholder =document.querySelector("#data-output");
+        let out = "";
+        for( let row of response.data.libros){
+            out += `
+                <tr>                 
+                 <td scope="row">${row.titulo}</td>
+                 <td>${row.isbn}</td>
+                </tr>   
+            `
+            console.log(row.titulo);
+        }
+        placeholder.innerHTML =out;
     }
     
     
     const handlequery = (e) =>{ 
         e.preventDefault();
-
-        client.query({query}).then( res => {console.log(res.data)});
+        get_elementos();
     }
 
     const handleClickLogOut = (e) => { 
-        _cookies.remove("user_Token");
-        navigate("/"); }
-
+        _cookies.remove("user_Token");        
+        navigate("/"); 
+    }   
     return (
-        <div class="wrapper">
+        
+        <div class="wrapper" >     
             <div class="image_wrapper">
                 <div class="side_image">
                     <div style={l_icon_style}>
@@ -113,7 +120,18 @@ const MainPage = () => {
             </form>
 
             <div class="Results-Wrapper">
+                    <table striped bordered hover>
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Código</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-output">
 
+
+                        </tbody>
+                    </table>
             </div>
         </div>
     )

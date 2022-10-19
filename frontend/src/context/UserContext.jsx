@@ -1,7 +1,6 @@
 
 import React, {createContext, useEffect, useState} from "react";
 import Cookies from "universal-cookie";
-
 export const UserContext = createContext();
 export const _cookies = new Cookies();
 
@@ -19,10 +18,9 @@ export const UserProvider = (props) => {
             };
 
             const response = await fetch("http://localhost:8000/api/me", requestOptions);
-            if (!response.ok) {
+            if (!response.ok) {            
                 setToken(null);
-            }
-            console.log(response.json());
+            }            
             _cookies.set("user_Token", token);
         };
         fetchUser();

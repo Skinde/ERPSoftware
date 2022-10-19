@@ -46,6 +46,7 @@ type Query {
     test: String
     libros: [Libro]
     libros_filter(filter: String!): [Libro]
+    libros_titulo(titulo: String!): [Libro]
     juguetes: [Juguete]
     item_libro: [Item_Libro]
     item_juguete: [Item_Juguete]

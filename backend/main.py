@@ -28,7 +28,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.get("/")
 async def root():
     return {
@@ -125,13 +124,24 @@ async def get_elements(
         print(e)
 
 # CREATE ENDPOINTS
-@app.post("/api/libros/insert_one")
-async def add_book(
+@app.post("/api/libros/insert")
+async def add_books(
     libro : _schemas._Libro,
     current_user = _fastapi.Depends(_services.get_current_user), 
-    db: _orm.Session = _fastapi.Depends(_database.get_db)
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    qt: int = 1,
+    pu: float = 0
 ):
-    """Insert a toy in the database and return its identifier(PK)"""
+    """Insert a book (item and data) in the database and return its identifier(PK)"""
+    if qt < 1:
+        return _fastapi.HTTPException(
+            status_code=400, 
+            detail="Invalid quantity",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    if pu < 0:
+        pu = 0
+    
     try:
         libro.titulo = libro.nombre
         db_response = db.query(_models.Libro).filter_by(titulo=libro.titulo).first()
@@ -157,7 +167,6 @@ async def add_book(
 
             libro.tipo = "libro"
             libro = _models.Libro(**dict(libro))
-            # libro_response = libro.insert()
             libro_response = _services.insert_on_db(libro)
 
             if not libro_response["success"]:
@@ -166,17 +175,24 @@ async def add_book(
                     detail=libro_response,
                     headers={"WWW-Authenticate": "Bearer"}
                 )
+        
         item_data = {
-            "titulo": libro.titulo
+            "titulo": libro.titulo,
+            "precio_compra": pu,
+            "valor": pu
         }
-        new_item = _models.Inventario_libro(**item_data)
-        # insert_item_response = new_item.insert()
-        insert_item_response = _services.insert_on_db(new_item)
 
+        items_response = []
+        for _ in range(qt):
+            new_item = _models.Inventario_libro(**item_data)
+            insert_item_response = _services.insert_on_db(new_item)
+            items_response.append(insert_item_response)
+        items_success = sum([res_item["success"] for res_item in items_response])
         return {
             "success": True,
             "libro": libro,
-            "insert item response": insert_item_response
+            "message": f"{items_success} items added sucessfully",
+            "items response": items_response,
         }
     except Exception as e:
         print(e)
@@ -189,19 +205,29 @@ async def add_book(
             headers={"WWW-Authenticate": "Bearer"}
         )
 
-@app.post("/api/juguetes/insert_one")
-async def add_toy(
+@app.post("/api/juguetes/insert")
+async def add_toys(
     juguete : _schemas._Juguete,
     current_user = _fastapi.Depends(_services.get_current_user), 
-    db: _orm.Session = _fastapi.Depends(_database.get_db)
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    qt: int = 1,
+    pu: float = 0
 ):
-    """Insert a toy in the database and return its identifier(uuid)"""
+    """Insert a toy(item and data) in the database and return its identifier(uuid)"""
+    if qt < 1:
+        return _fastapi.HTTPException(
+            status_code=400, 
+            detail="Invalid quantity",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    if pu < 0:
+        pu = 0
+    
     try:
         db_response = db.query(_models.Juguete).filter_by(nombre=juguete.nombre).first()
         if not db_response:
             juguete.tipo = "juguete"
             juguete = _models.Juguete(**dict(juguete))
-            # juguete_response = juguete.insert()
             juguete_response = _services.insert_on_db(juguete)
 
             if not juguete_response["success"]:
@@ -212,16 +238,23 @@ async def add_toy(
                 )
 
         item_data = {
-            "nombre": juguete.nombre
+            "nombre": juguete.nombre,
+            "precio_compra": pu,
+            "valor": pu
         }
-        new_item = _models.Inventario_juguete(**item_data)
-        # insert_item_response = new_item.insert()
-        insert_item_response = _services.insert_on_db(new_item)
+        items_response = []
+        for _ in range(qt):
+            new_item = _models.Inventario_juguete(**item_data)
+            insert_item_response = _services.insert_on_db(new_item) 
+            items_response.append(insert_item_response)
+        
+        items_success = sum([res_item["success"] for res_item in items_response])
 
         return {
             "success": True,
             "juguete": juguete,
-            "insert item response": insert_item_response
+            "message": f"{items_success} items added sucessfully",
+            "items response": items_response,
         }
     except Exception as e:
         print(e)

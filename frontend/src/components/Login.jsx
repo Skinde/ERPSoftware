@@ -31,10 +31,8 @@ const Login = () => {
 
             if (!response.ok){
                 _cookies.remove("user_Token");
-                //throw new Error(response.statusText);
             } else {
                 const data = await response.json(); 
-                console.log(data.access_token);
                 setToken(data.access_token);
             }
         };
@@ -53,40 +51,8 @@ const Login = () => {
     
     const handleSubmit = (e) => {
         e.preventDefault();
-        //setFormErrors(validate(formValues));
-        //setIsSubmit(true);
-
-        //if (isEmpty(validate(formValues))) {
-            submitLogin();
-        //}
-    };
-    /*
-    useEffect(() => {
-        console.log(formErrors);
-        if (Object.keys(formErrors).length === 0 && isSubmit) {
-            console.log(formValues);
-        }
-    }, [formErrors]);
-
-    const validate = (values) => {
-        const errors = {};
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-
-        if (!values.email) {
-            errors.email = "Email is required!";
-        } else if (!regex.test(values.email)) {
-            errors.email = "This is not a valid email format!";
-        }
-        if (!values.password) {
-            errors.password = "Password is required";
-        } else if (values.password.length < 4) {
-            errors.password = "Password must be more than 4 characters";
-        } else if (values.password.length > 10) {
-            errors.password = "Password cannot exceed more than 10 characters";
-        }
-        return errors;
-    };
-    */
+        submitLogin();
+    };    
 
     return (
         <div class="main-box">
