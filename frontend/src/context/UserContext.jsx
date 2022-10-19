@@ -1,11 +1,12 @@
+
 import React, {createContext, useEffect, useState} from "react";
 import Cookies from "universal-cookie";
 
 export const UserContext = createContext();
-export const cookies = new Cookies();
+export const _cookies = new Cookies();
 
 export const UserProvider = (props) => {
-    const [token, setToken] = useState(cookies.get("user_Token"));
+    const [token, setToken] = useState(_cookies.get("user_Token"));
 
     useEffect(() =>{
         const fetchUser = async () => {
@@ -22,7 +23,7 @@ export const UserProvider = (props) => {
                 setToken(null);
             }
             console.log(response.json());
-            cookies.set("user_Token", token);
+            _cookies.set("user_Token", token);
         };
         fetchUser();
     }, [token]);    

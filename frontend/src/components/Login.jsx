@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useContext } from "react";
-import { UserContext, cookies} from "../context/UserContext"; 
+import { UserContext, _cookies} from "../context/UserContext"; 
 import './../styles/App_Login.css';
 import { useNavigate } from "react-router-dom";
 
@@ -30,7 +30,7 @@ const Login = () => {
             );
 
             if (!response.ok){
-                cookies.remove("user_Token");
+                _cookies.remove("user_Token");
                 //throw new Error(response.statusText);
             } else {
                 const data = await response.json(); 
@@ -46,9 +46,9 @@ const Login = () => {
 
     const navigate = useNavigate();
     const handleClickSignIn = (e) => {
-        //if (isEmpty(validate(formValues))) {
+        if (_cookies.get("user_Token") != null) {
             navigate("/Home");
-        //}
+        }
     }
     
     const handleSubmit = (e) => {

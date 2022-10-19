@@ -1,14 +1,34 @@
-import React from "react";
+import React, { useContext } from "react";
 import './../styles/Main_page.css';
 import { useNavigate } from "react-router-dom";
+import { UserContext, _cookies } from "../context/UserContext";
+
+
 
 const l_icon_style = {marginTop: '6px'}
 const l_icon = require('./../oficial_icon.png');
 
 const MainPage = () => {
-
+    const [token] = useContext(UserContext);
     const navigate = useNavigate();
-    const handleClickLogOut = (e) => { navigate("/"); }
+    const get_elementos = async () => {
+        const requestOptions ={
+            method: "GET",                
+            headers: {
+                "accept": "application/json",
+                Authorization: "Bearer " + token,
+            },            
+        };
+        const response =  (await fetch("http://localhost:8000/api/elementos?limit=10&page=1", requestOptions)
+            );
+        console.log(response.json());
+    }
+    
+
+
+    const handleClickLogOut = (e) => { 
+        _cookies.remove("user_Token");
+        navigate("/"); }
 
     return (
         <div class="wrapper">
@@ -52,7 +72,7 @@ const MainPage = () => {
                     <input type="text" placeholder="ISBN"/>
                 </div>
 
-                <input type="submit" value="Search"/>
+                <input type="submit" value="Search" onClick={get_elementos}/>
             </form>
 
             <div class="Results-Wrapper">
