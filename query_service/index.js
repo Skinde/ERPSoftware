@@ -9,14 +9,14 @@ const fs = require("fs");
 
 const app = express();
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 8001);
 
 const typeDefs = buildSchema(fs.readFileSync('./schema.graphql').toString());
 const { resolvers } = require('./resolver.js');
 
 // ENDPOINTS
 app.get('/', async (req, res) => {
-    const api_res = await axios.get(process.env.API_HOST + "/",)
+    const api_res = await axios.get(process.env.API_HOST + "/")
         .then(res => res.data)
         .catch(err => {
             console.log(err);

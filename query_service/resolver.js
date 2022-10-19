@@ -29,15 +29,12 @@ const resolvers = {
         })
             .then(res => res.data)
             .catch(err => console.log(err));
-        
         let response = Libros;
-        console.log(response);
+
         const query = JSON.parse(filter);
         if (query["titulo"])
             response = response.find(libro => libro.titulo.toLowerCase().includes(query["titulo"]) ) || [];
         
-        console.log(query);
-        console.log(response);
         if (typeof response === 'object')
             return [response];
         return response;

@@ -32,3 +32,29 @@
     titulo
   }
 }	
+
+{
+  libros {
+    titulo
+    isbn
+    autor
+  }
+  juguetes {
+    nombre
+    modo_juego
+  }
+  item_libro {
+    uuid
+    titulo
+    sede
+    valor
+  }
+  item_juguete {
+    uuid
+    nombre
+  }
+  libros_filter (filter: "{ \"titulo\": \"algorithms\"}"){
+    titulo
+    isbn
+  }
+}
