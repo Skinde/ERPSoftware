@@ -37,21 +37,15 @@ const Login = () => {
             }
         };
 
-    
 
-
-
-
-    const navigate = useNavigate();
-    const handleClickSignIn = (e) => {
-        if (_cookies.get("user_Token") != null) {
-            navigate("/Home");
-        }
-    }
+    const navigate = useNavigate();    
     
     const handleSubmit = (e) => {
         e.preventDefault();
         submitLogin();
+        if (_cookies.get("user_Token") != null) {
+            navigate("/Home");
+        }
     };    
 
     return (
@@ -77,7 +71,7 @@ const Login = () => {
                     
                 </div>
                 
-                <input type="submit" value="Login" onClick={handleClickSignIn}/>
+                <input type="submit" value="Login" />
             </form>
         </div>
         )
