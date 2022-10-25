@@ -61,15 +61,6 @@ def insert_on_db(obj):
     finally:
         session.close()
 
-def update_on_db(obj):
-    session = _database.Session()
-    try:
-        session.commit()
-    except Exception as e:
-        session.rollback()
-    finally:
-        session.close()
-
 def delete_on_db(obj):
     session = _database.Session()
     try:
@@ -90,6 +81,14 @@ def delete_on_db(obj):
         }
     finally:
         session.close()
+
+# ROW_2_DICT = lambda r: {c.name: str(getattr(r, c.name)) for c in r.__table__.columns}
+def row2dict(row):
+    d = {}
+    for column in row.__table__.columns:
+        d[column.name] = str(getattr(row, column.name))
+
+    return d
 
 # API SERVICES
 async def get_current_user(

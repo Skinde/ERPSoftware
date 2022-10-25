@@ -78,8 +78,8 @@ class _ItemLibro(_pydantic.BaseModel):
     sede: _typing.Optional[str] = ""
     precio_compra: _typing.Optional[float] = -1
     valor: _typing.Optional[float] = -1
-    fecha_adquisicion: _typing.Optional[_datetime.datetime] = _datetime.datetime.now
-    fecha_caducidad: _typing.Optional[_datetime.datetime]
+    fecha_adquisicion: _typing.Optional[_datetime.datetime] = _datetime.datetime.now()
+    fecha_caducidad: _typing.Optional[_datetime.datetime] = _datetime.datetime.now() + _datetime.timedelta(days=365)
 
     class Config:
         orm_mode = True
@@ -93,7 +93,7 @@ class _ItemJuguete(_pydantic.BaseModel):
     precio_compra: _typing.Optional[float] = -1
     valor: _typing.Optional[float] = -1
     fecha_adquisicion: _typing.Optional[_datetime.datetime] = _datetime.datetime.now()
-    fecha_caducidad: _typing.Optional[_datetime.datetime]
+    fecha_caducidad: _typing.Optional[_datetime.datetime] = _datetime.datetime.now() + _datetime.timedelta(days=365)
 
     class Config:
         orm_mode = True

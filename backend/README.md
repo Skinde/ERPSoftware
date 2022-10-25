@@ -26,10 +26,19 @@
 - https://docs.sqlalchemy.org/en/14/orm/session_api.html#sqlalchemy.orm.Session
 - https://docs.sqlalchemy.org/en/14/orm/extensions/declarative/
 
+`schemas.py`
+- https://stackoverflow.com/questions/5158160/python-get-datetime-for-3-years-ago-today
+
 `main.py`
 - https://stackoverflow.com/questions/16586180/typeerror-objectid-is-not-json-serializable
 - https://docs.sqlalchemy.org/en/14/tutorial/data_insert.html
 - https://stackoverflow.com/questions/72395169/error-sqlalchemy-orm-exc-detachedinstanceerror-instance-user-at-0x102827910-i
+- https://stackoverflow.com/questions/1958219/how-to-convert-sqlalchemy-row-object-to-a-python-dict
+- https://stackoverflow.com/questions/270879/efficiently-updating-database-using-sqlalchemy-orm
+- https://stackoverflow.com/questions/25943616/update-limit-1-with-sqlalchemy-and-postgresql
+- https://gist.github.com/restureese/531424ecda47c93bba0a4dfd34fc4c0b
+- https://stackoverflow.com/questions/54365873/sqlalchemy-update-multiple-rows-in-one-transaction
+- 
 
 `book_api_consumer.py`
 
