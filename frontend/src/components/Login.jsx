@@ -3,17 +3,18 @@ import { useState, useContext } from "react";
 import { UserContext, _cookies} from "../context/UserContext"; 
 import './../styles/App_Login.css';
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+
 
 const logo_style = { marginTop: '25px' }
 const logo = require('./../oficial_logo.png');
 
 
 const Login = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    /*const [formErrors, setFormErrors] = useState({});
-    const [isSubmit, setIsSubmit] = useState(false);*/
+    const { register, handleSubmit, getValues, formState: {errors} } = useForm();
+
     const [, setToken] = useContext(UserContext);
+
 
     const submitLogin = async () => {
         
@@ -22,7 +23,7 @@ const Login = () => {
                 headers: {"Content-Type": "application/x-www-form-urlencoded",
                          'accept': 'application/json',},                
                 body: JSON.stringify(
-                    `grant_type=&username=${email}&password=${password}&scope=&client_id=&client_secret=`
+                    `grant_type=&username=${getValues("email")}&password=${getValues("password")}&scope=&client_id=&client_secret=`
                 ),
             };
             
@@ -40,8 +41,8 @@ const Login = () => {
 
     const navigate = useNavigate();    
     
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmission = (e) => {
+        //e.preventDefault();
         submitLogin();
         if (_cookies.get("user_Token") != null) {
             navigate("/Home");
@@ -56,17 +57,20 @@ const Login = () => {
     
             <header>Employee Login</header>
             
-            <form onSubmit={handleSubmit} name="theForm">
+            <form onSubmit={handleSubmit(handleSubmission)} name="theForm">
                 <div className="ui form">
                     <div className="txt_field">
-                        <input class="input_e" type="text" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                        <input class="input_e"  {...register("email", {required: true} )}/>                        
                         <span class="bar-line"></span>
+                        
+
                     </div>
                      
     
                     <div className="txt_field">
-                        <input class="input_e" type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                        <input class="input_e" type="password" {...register("password", {required: true})} />                        
                         <span class="bar-line"></span>
+                        
                     </div>
                     
                 </div>
