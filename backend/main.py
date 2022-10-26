@@ -1,3 +1,4 @@
+import datetime as _datetime
 import fastapi as _fastapi
 import fastapi.security as _security
 from fastapi.middleware.cors import CORSMiddleware as _CORSMiddleware
@@ -389,6 +390,47 @@ async def get_inventario_juguetes(
             headers={"WWW-Authenticate": "Bearer"}
         )
 
+@app.get("/api/inventario")
+async def get_inventario(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+):
+    try:
+        juguetes = db.query(_models.Inventario_juguete).all()
+        libros = db.query(_models.Inventario_libro).all()
+        
+        libros = [_schemas._ItemLibro.from_orm(l).dict() for l in libros]
+        juguetes = [_schemas._ItemJuguete.from_orm(l).dict() for l in juguetes]
+        
+        # import json
+        for j in juguetes:
+            j["fecha_adquisicion"] = j["fecha_adquisicion"].strftime('%d/%m/%Y')
+            j["fecha_caducidad"] = j["fecha_caducidad"].strftime('%d/%m/%Y')
+            # print(json.dumps(j, indent=2))
+        
+        for l in libros:
+            l["fecha_adquisicion"] = l["fecha_adquisicion"].strftime('%d/%m/%Y')
+            l["fecha_caducidad"] = l["fecha_caducidad"].strftime('%d/%m/%Y')
+            l["nombre"] = l["titulo"]
+            # print(json.dumps(j, indent=2))
+
+        return {
+            "success": True,
+            "juguetes": juguetes,
+            "libros": libros
+        }
+    except Exception as e:
+        print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+# SELL ENDPOINTS
 @app.post("/api/inventario_libros/sell")
 async def sell_libro(
     current_user = _fastapi.Depends(_services.get_current_user),
@@ -469,6 +511,7 @@ async def sell_juguete(
     finally:
         session.close()
 
+# DEBASEMENT ENDPOINTS
 @app.post("/api/inventario_libros/debasement")
 async def debasement_libro(
     current_user = _fastapi.Depends(_services.get_current_user),
