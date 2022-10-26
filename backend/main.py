@@ -1,3 +1,4 @@
+import datetime as _datetime
 import fastapi as _fastapi
 import fastapi.security as _security
 from fastapi.middleware.cors import CORSMiddleware as _CORSMiddleware
@@ -91,7 +92,6 @@ async def generate_token(
     response: dict = await _services.create_token(user)
     return response
 
-
 @app.get("/api/me")
 async def get_current_user(
     current_user = _fastapi.Depends(_services.get_current_user)
@@ -153,7 +153,7 @@ async def add_books(
             if response_API["success"]:
                 try:
                     book_data = response_API["response"]["items"][0]
-                    print(_json.dumps(book_data, indent=4))
+                    # print(_json.dumps(book_data, indent=4))
                     print(type(book_data))
 
                     libro.autor = " & ".join(book_data["volumeInfo"]["authors"])
@@ -179,12 +179,13 @@ async def add_books(
         item_data = {
             "titulo": libro.titulo,
             "precio_compra": pu,
-            "valor": pu
+            "valor": pu,
+            "estado": "disponible"
         }
-
+        item_data = _schemas._ItemLibro(**item_data)
         items_response = []
         for _ in range(qt):
-            new_item = _models.Inventario_libro(**item_data)
+            new_item = _models.Inventario_libro(**dict(item_data))
             insert_item_response = _services.insert_on_db(new_item)
             items_response.append(insert_item_response)
         items_success = sum([res_item["success"] for res_item in items_response])
@@ -240,11 +241,13 @@ async def add_toys(
         item_data = {
             "nombre": juguete.nombre,
             "precio_compra": pu,
-            "valor": pu
+            "valor": pu,
+            "estado": "disponible"
         }
+        item_data = _schemas._ItemJuguete(**item_data)
         items_response = []
         for _ in range(qt):
-            new_item = _models.Inventario_juguete(**item_data)
+            new_item = _models.Inventario_juguete(**dict(item_data))
             insert_item_response = _services.insert_on_db(new_item) 
             items_response.append(insert_item_response)
         
@@ -387,3 +390,140 @@ async def get_inventario_juguetes(
             headers={"WWW-Authenticate": "Bearer"}
         )
 
+@app.get("/api/inventario")
+async def get_inventario(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+):
+    try:
+        juguetes = db.query(_models.Inventario_juguete).all()
+        libros = db.query(_models.Inventario_libro).all()
+        
+        libros = [_schemas._ItemLibro.from_orm(l).dict() for l in libros]
+        juguetes = [_schemas._ItemJuguete.from_orm(l).dict() for l in juguetes]
+        
+        # import json
+        for j in juguetes:
+            j["fecha_adquisicion"] = j["fecha_adquisicion"].strftime('%d/%m/%Y')
+            j["fecha_caducidad"] = j["fecha_caducidad"].strftime('%d/%m/%Y')
+            # print(json.dumps(j, indent=2))
+        
+        for l in libros:
+            l["fecha_adquisicion"] = l["fecha_adquisicion"].strftime('%d/%m/%Y')
+            l["fecha_caducidad"] = l["fecha_caducidad"].strftime('%d/%m/%Y')
+            l["nombre"] = l["titulo"]
+            # print(json.dumps(j, indent=2))
+
+        return {
+            "success": True,
+            "juguetes": juguetes,
+            "libros": libros
+        }
+    except Exception as e:
+        print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+# SELL ENDPOINTS
+@app.post("/api/inventario_libros/sell")
+async def sell_libro(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    qt: int = 1
+):
+    "Sell book or books and change their status"
+    
+    session = _database.Session()
+    try:
+        model_instances = session.query(_models.Inventario_libro).\
+            filter_by(estado='disponible').\
+                limit(qt).all()
+        
+        if len(model_instances) == 0:
+            return {
+                "success": False,
+                "message": "no available items"
+            }
+        
+        for libro in model_instances:
+            libro.estado = 'vendido'
+        
+        session.commit()
+        return {
+            "success": True,
+            "sold items": { libro.uuid: _services.row2dict(libro) for libro in model_instances }
+        }
+    except Exception as e:
+        session.rollback()
+        return {
+            "success": False,
+            "error": {
+                "type": str(type(e.orig)),
+                "code": e.code
+            }
+        }
+    finally:
+        session.close()
+
+@app.post("/api/inventario_juguetes/sell")
+async def sell_juguete(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    qt: int = 1
+):
+    "Sell toy or toys and change their status"
+    
+    session = _database.Session()
+    try:
+        model_instances = session.query(_models.Inventario_juguete).\
+            filter_by(estado='disponible').\
+                limit(qt).all()
+        
+        if len(model_instances) == 0:
+            return {
+                "success": False,
+                "message": "no available items"
+            }
+        
+        for juguete in model_instances:
+            juguete.estado = 'vendido'
+        
+        session.commit()
+        return {
+            "success": True,
+            "sold items": { juguete.uuid: _services.row2dict(juguete) for juguete in model_instances }
+        }
+    except Exception as e:
+        session.rollback()
+        return {
+            "success": False,
+            "error": {
+                "type": str(type(e.orig)),
+                "code": e.code
+            }
+        }
+    finally:
+        session.close()
+
+# DEBASEMENT ENDPOINTS
+@app.post("/api/inventario_libros/debasement")
+async def debasement_libro(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    qt: int = 1
+):
+    pass
+
+@app.post("/api/inventario_juguetes/debasement")
+async def debasement_juguete(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    qt: int = 1
+):
+    pass

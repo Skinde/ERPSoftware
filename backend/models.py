@@ -383,5 +383,5 @@ class Inventario_juguete(_database.Base):
             session.close()
 
     def __repr__(self) -> str:
-        return f"InventarioJuguete ({self.item_id} {self.estado} {self.valor} {self.fecha_adquisicion})"
+        return f"InventarioJuguete ({self.uuid} {self.estado} {self.valor} {self.fecha_adquisicion})"
 

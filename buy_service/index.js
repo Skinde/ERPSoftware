@@ -50,4 +50,4 @@ app.post('/', async (req, res) => {
 app.listen(app.get('port'), () => {
     // console.log(process.env);
     console.log(`Server listen on port ${app.get('port')}`);
-});
+})
