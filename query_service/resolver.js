@@ -1,11 +1,17 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
+const { createClient } = require('redis');
 dotenv.config();
 
-const aux_auth_token = `${process.env.JWT_TOKEN_TYPE} ${process.env.JWT_AUTH_TOKEN}`;
+const client = createClient({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
+});
+client.on('error', (err) => console.log('redis-cli error', err));
+
 const instance = axios.create({
     baseURL: process.env.API_HOST,
-    // timeout: 6000
+    timeout: 6000
 });
 
 const op = {
@@ -15,148 +21,10 @@ const op = {
     lte: (f, s) => f <= s,
     lt: (f, s) => f < s,
     contains: (f, s) => f.toLowerCase().includes(s.toLowerCase())
-}
+};
 
 const resolvers = {
     test: () => 'Test success',
-    // OLD
-    libros_filter: async ({ filter }, context) => {
-        let { Libros } = await instance.get("/api/libros", {
-            headers: {
-                'Authorization': context['auth'] || aux_auth_token
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        let response = Libros;
-
-        const query = JSON.parse(filter);
-        if (query["titulo"])
-            response = response.find(libro => libro.titulo.toLowerCase().includes(query["titulo"]) ) || [];
-        
-        if (typeof response === 'object')
-            return [response];
-        return response;
-    },
-    libros: async ({}, context) => {     
-        const books = await instance.get("/api/libros", {
-            headers: {
-                'Authorization': context['auth'] || aux_auth_token
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        
-        return books["Libros"] || [];
-    },
-    libros_titulo: async ({ titulo }, context) => {
-        let { Libros } = await instance.get("/api/libros", {
-            headers: {
-                'Authorization': context['auth'] || aux_auth_token
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        let response = Libros;
-        let response_arr = [];
-
-        Object.keys(response).forEach((key, index) => {
-            if (response[key].titulo.toLowerCase().includes(titulo.toLowerCase()))
-                response_arr.push(response[key]);
-        });
-        return response_arr;
-    },
-    item_libro: async ({}, context) => {     
-        const books = await instance.get("/api/inventario_libros", {
-            headers: {
-                'Authorization': context['auth'] || aux_auth_token
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        
-        return books["Libros"] || [];
-    },
-    item_libro_titulo: async ({ titulo }, context) => {
-        let { Libros } = await instance.get("/api/inventario_libros", {
-            headers: {
-                'Authorization': context['auth'] || aux_auth_token
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        let response = Libros;
-        let response_arr = [];
-
-        Object.keys(response).forEach((key, index) => {
-            if (response[key].titulo.toLowerCase().includes(titulo.toLowerCase()))
-                response_arr.push(response[key]);
-        });
-        return response_arr;
-    }, 
-    juguetes: async ({}, context) => {
-        const toys = await instance.get("/api/juguetes", {
-            headers: {
-                'Authorization': context['auth'] || aux_auth_token
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        
-        return toys["Juguetes"] || [];
-    },
-    juguetes_nombre: async ({ nombre }, context) => {
-        const res = await instance.get("/api/juguetes", {
-            headers: {
-                'Authorization': context['auth'] || aux_auth_token
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        let response = res["Juguetes"];
-        // console.log(typeof response);
-        // console.log(Object.keys(response));
-        
-        let keys = Object.keys(response);
-        // keys.forEach((key, index) => {
-        //     console.log(`${key}: ${JSON.stringify(response[key])}`);
-        // });
-        let response_arr = [];
-        keys.forEach((key, index) => {
-            if (response[key].nombre.toLowerCase().includes(nombre.toLowerCase()))
-                response_arr.push(response[key]);
-            // console.log(`${key}: ${JSON.stringify(response[key])}`);
-        });
-        return response_arr;
-    },
-    item_juguete: async({}, context) => {
-        const toys = await instance.get("/api/inventario_juguetes", {
-            headers: {
-                'Authorization': context['auth'] || aux_auth_token
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        
-        return toys["Juguetes"] || [];
-    },
-    item_juguete_nombre: async({ nombre }, context) => {
-        const { Juguetes } = await instance.get("/api/inventario_juguetes", {
-            headers: {
-                'Authorization': context['auth'] || aux_auth_token
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        let response = Juguetes;
-        let response_arr = [];
-
-        Object.keys(response).forEach((key, index) => {
-            if (response[key].nombre.toLowerCase().includes(nombre.toLowerCase()))
-                response_arr.push(response[key]);
-        });
-        return response_arr;
-    },
     // NEW
     filter_libro: async({ filter }, context) => {
         // PARSE filter ARGUMENT -> CONSTRUCT filter_funcs ARRAY
@@ -183,7 +51,7 @@ const resolvers = {
         // GET libros FROM centralAPI OR RedisCache
         let { Libros } = await instance.get("/api/libros", {
             headers: {
-                'Authorization': context['auth'] || aux_auth_token
+                'Authorization': context['auth']
             }
         })
             .then(res => res.data)
@@ -228,7 +96,7 @@ const resolvers = {
         // GET juguetes FROM centralAPI OR RedisCache
         let { Juguetes } = await instance.get("/api/juguetes", {
             headers: {
-                'Authorization': context['auth'] || aux_auth_token
+                'Authorization': context['auth']
             }
         })
             .then(res => res.data)
@@ -251,8 +119,3 @@ const resolvers = {
 }
 
 module.exports = { resolvers };
-
-/**
- * IDEA: 
- * filter js => function that return a function
- */

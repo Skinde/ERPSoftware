@@ -5,7 +5,10 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 dotenv.config();
 
-const baseDate = new Date(); 
+const getCurrentDate = () => {
+    const baseDate = new Date(); 
+    return baseDate.getDate() + "/" + (baseDate.getMonth()+1)  + "/" + baseDate.getFullYear() + " - "  + baseDate.getHours() + ":"  + baseDate.getMinutes() + ":" + baseDate.getSeconds();
+}
 const express = require('express');
 const fs = require("fs");
 
@@ -17,12 +20,15 @@ app.use(
     })
 )
 app.use(async (req, res, next) => {
-    let cDate =  baseDate.getDate() + "/" + 
-                    (baseDate.getMonth()+1)  + "/" + 
-                    baseDate.getFullYear() + " - "  + 
-                    baseDate.getHours() + ":"  + 
-                    baseDate.getMinutes() + ":" + 
-                    baseDate.getSeconds();
+    let cDate =  getCurrentDate();
+
+    if (!req.headers['authorization']) {
+        req.headers['authorization'] = `${process.env.JWT_TOKEN_TYPE} ${process.env.JWT_AUTH_TOKEN}`;
+        console.log("\tautorizacion de desarrollo");
+    } else {
+        console.log("\tautorizado");
+    }
+    
     console.log(`${req.method} ${req.url} \t ${cDate}`);
     next();
 })
