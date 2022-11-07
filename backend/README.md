@@ -38,10 +38,10 @@
 - https://stackoverflow.com/questions/25943616/update-limit-1-with-sqlalchemy-and-postgresql
 - https://gist.github.com/restureese/531424ecda47c93bba0a4dfd34fc4c0b
 - https://stackoverflow.com/questions/54365873/sqlalchemy-update-multiple-rows-in-one-transaction
-- 
+- https://stackoverflow.com/questions/10624937/convert-datetime-object-to-a-string-of-date-only-in-python
+- https://stackoverflow.com/questions/12943819/how-to-prettyprint-a-json-file
 
 `book_api_consumer.py`
-
 - https://stackoverflow.com/questions/12943819/how-to-prettyprint-a-json-file
 - https://stackoverflow.com/questions/52102398/typeerror-byte-indices-must-be-integers-or-slices-not-str
 - https://stackoverflow.com/questions/42009202/how-to-call-a-async-function-contained-in-a-class
@@ -62,3 +62,12 @@
 - https://stackoverflow.com/questions/36984371/your-configuration-specifies-to-merge-with-the-branch-name-from-the-remote-bu\
 - https://stackoverflow.com/questions/35941566/git-says-remote-ref-does-not-exist-when-i-delete-remote-branch
 - https://askubuntu.com/questions/134997/how-to-change-folders-color
+
+|   Elemento  |
+|:-----------:|
+|    nombre   |
+|     tipo    |
+|     peso    |
+| dimensiones |
+|  proveedor  |
+|   ranking   |

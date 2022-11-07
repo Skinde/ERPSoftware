@@ -42,8 +42,38 @@ type Item_Libro {
     fecha_caducidad: String
 }
 
+type Item {
+    # uuid: String
+    nombre: String
+    estado: String
+    sede: String
+    precio_compra: Float
+    valor: Float
+    fecha_adquisicion: String
+    fecha_caducidad: String
+}
+
+input FilterAND {
+    and: [FilterOR!]
+}
+
+input FilterOR {
+    or: [Filter!]
+}
+
+input Filter {
+    field: String!
+    eq: String
+    contains: String
+    gte: String
+    gt: String
+    lt: String
+    lte: String
+}
+
 type Query {
     test: String
+    # OLD
     libros_filter(filter: String!): [Libro]
     libros: [Libro]
     libros_titulo(titulo: String!): [Libro]
@@ -53,4 +83,8 @@ type Query {
     item_libro_titulo(titulo: String!): [Item_Libro]
     item_juguete: [Item_Juguete]
     item_juguete_nombre(nombre: String!): [Item_Juguete]
+    # NEW
+    filter_libro(filter: FilterAND): [Libro]
+    filter_juguete(filter: FilterAND): [Juguete]
+    item_filter(filter: FilterAND): [Item]
 }
