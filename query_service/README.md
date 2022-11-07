@@ -17,19 +17,19 @@
 - https://www.anycodings.com/1questions/831451/how-to-pass-arguments-to-graphqlhttp-middleware
 
 
-https://graphql.org/learn/queries/
-https://graphql.org/graphql-js/basic-types/
-https://graphql.org/graphql-js/constructing-types/
-https://graphql.org/graphql-js/passing-arguments/
-https://graphql.org/graphql-js/authentication-and-express-middleware/
-https://graphql.org/graphql-js/graphql-clients/
-https://www.apollographql.com/blog/graphql/examples/4-simple-ways-to-call-a-graphql-api/
-https://graphql.org/blog/rest-api-graphql-wrapper/
-https://hasura.io/learn/graphql/intro-graphql/graphql-queries/
-https://www.tutorialspoint.com/graphql/index.htm
-https://www.tutorialspoint.com/graphql/index.htm
+- https://graphql.org/learn/queries/
+- https://graphql.org/graphql-js/basic-types/
+- https://graphql.org/graphql-js/constructing-types/
+- https://graphql.org/graphql-js/passing-arguments/
+- https://graphql.org/graphql-js/authentication-and-express-middleware/
+- https://graphql.org/graphql-js/graphql-clients/
+- https://www.apollographql.com/blog/graphql/examples/4-simple-ways-to-call-a-graphql-api/
+- https://graphql.org/blog/rest-api-graphql-wrapper/
+- https://hasura.io/learn/graphql/intro-graphql/graphql-queries/
+- https://www.tutorialspoint.com/graphql/index.htm
+- https://www.tutorialspoint.com/graphql/index.htm
 
-https://medium.com/codingthesmartway-com-blog/creating-a-graphql-server-with-node-js-and-express-f6dddc5320e1
+- https://medium.com/codingthesmartway-com-blog/creating-a-graphql-server-with-node-js-and-express-f6dddc5320e1
 https://www.mongodb.com/docs/atlas/app-services/graphql/authenticate/
 
 

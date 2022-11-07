@@ -5,15 +5,27 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 dotenv.config();
 
+const baseDate = new Date(); 
 const express = require('express');
 const fs = require("fs");
 
 const app = express();
+
 app.use(
-    cors(
-        {origin: "http://localhost:3000"}
-    )
+    cors({
+        origin: "http://localhost:3000"
+    })
 )
+app.use(async (req, res, next) => {
+    let cDate =  baseDate.getDate() + "/" + 
+                    (baseDate.getMonth()+1)  + "/" + 
+                    baseDate.getFullYear() + " - "  + 
+                    baseDate.getHours() + ":"  + 
+                    baseDate.getMinutes() + ":" + 
+                    baseDate.getSeconds();
+    console.log(`${req.method} ${req.url} \t ${cDate}`);
+    next();
+})
 app.set('port', process.env.PORT || 4000);
 
 const typeDefs = buildSchema(fs.readFileSync('./schema.graphql').toString());
