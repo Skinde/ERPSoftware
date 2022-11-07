@@ -7,3 +7,4 @@ backend/alembic.ini
 node_modules/
 .ipynb_checkpoints/
 node_modules/
+*.rdb

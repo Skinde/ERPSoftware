@@ -7,7 +7,15 @@
 - https://melvingeorge.me/blog/get-all-the-contents-from-file-as-string-nodejs
 - https://www.contentful.com/blog/2021/01/14/graphql-via-http-in-five-ways/
 
+`resolvers.js`
+- https://stackoverflow.com/questions/1098040/checking-if-a-key-exists-in-a-javascript-object
+- https://stackoverflow.com/questions/23720988/how-to-filter-json-data-in-javascript-or-jquery
+- https://flexiple.com/javascript/loop-through-object-javascript/
 
+`redis`
+- https://stackoverflow.com/questions/42857551/could-not-connect-to-redis-at-127-0-0-16379-connection-refused-with-homebrew
+- https://redis.js.org/
+- https://www.npmjs.com/package/redis
 
 `graphql-http`
 - https://stackoverflow.com/questions/49081288/how-to-query-between-two-dates-in-graphql
