@@ -402,17 +402,17 @@ async def get_inventario(
         libros = [_schemas._ItemLibro.from_orm(l).dict() for l in libros]
         juguetes = [_schemas._ItemJuguete.from_orm(l).dict() for l in juguetes]
         
-        # import json
+        import json
         for j in juguetes:
             j["fecha_adquisicion"] = j["fecha_adquisicion"].strftime('%d/%m/%Y')
             j["fecha_caducidad"] = j["fecha_caducidad"].strftime('%d/%m/%Y')
-            # print(json.dumps(j, indent=2))
+            print(json.dumps(j, indent=2))
         
         for l in libros:
             l["fecha_adquisicion"] = l["fecha_adquisicion"].strftime('%d/%m/%Y')
             l["fecha_caducidad"] = l["fecha_caducidad"].strftime('%d/%m/%Y')
             l["nombre"] = l["titulo"]
-            # print(json.dumps(j, indent=2))
+            print(json.dumps(j, indent=2))
 
         return {
             "success": True,

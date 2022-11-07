@@ -11,10 +11,30 @@ const l_icon = require('./../oficial_icon.png');
 
 
 
-const columns = [
+let columns = [];
+const for_juguetes = [
+    { name: "Nombre", selector: row => row.nombre, sortable: true, center: false, left: true, grow: 1.5 },    
+    { name: "Modo de juego", selector: row => row.modo_juego, sortable: false, center: false, right: true },
+    { name: "Tema", selector: row => row.tema, sortable: false, center: false, right: true },
+    { name: "Público objetivo", selector: row => row.publico_objetivo, sortable: false, center: false, right: true },
+    { name: "Fuente de energía", selector: row => row.fuente_energia, sortable: false, center: false, right: true },
+    { name: "Material principal", selector: row => row.material_principal, sortable: false, center: false, right: true },
+];
+
+const for_libros = [
     { name: "Titulo", selector: row => row.titulo, sortable: true, center: false, left: true, grow: 1.5 },    
-    { name: "ISBN", selector: row => row.isbn, sortable: false, center: false, right: true }
-]
+    { name: "ISBN", selector: row => row.isbn, sortable: false, center: false, right: true },
+    { name: "Autor", selector: row => row.autor, sortable: false, center: false, right: true },
+    { name: "Idioma", selector: row => row.idioma, sortable: false, center: false, right: true },
+    { name: "Editorial", selector: row => row.editorial, sortable: false, center: false, right: true },
+    { name: "Formato", selector: row => row.formato, sortable: false, center: false, right: true },
+    { name: "Fecha de publicación", selector: row => row.fecha_publicacion, sortable: false, center: false, right: true },
+    { name: "Género", selector: row => row.genero, sortable: false, center: false, right: true },
+    { name: "Edición", selector: row => row.edicion, sortable: false, center: false, right: true },
+    { name: "N° de páginas", selector: row => row.nro_paginas, sortable: false, center: false, right: true },
+];  
+
+
 const customStyles = {
     rows: {
         style: { minHeight: '40px', paddingRight: '10px' },
@@ -31,35 +51,40 @@ const MainPage = () => {
     const [token, setToken] = useContext(UserContext);
     const [data_out, setData_out] = useState([]); 
     const { register, handleSubmit, getValues, formState: {errors} } = useForm();
+    let tipo = ""; 
+
     const navigate = useNavigate();
+
+
+
     const get_elementos = async () => {
         const response =  await axios.post(
             'http://127.0.0.1:4000/graphql', 
             {
                 query: `
                 {
-                    item_juguete { 
-                        uuid 
-                        nombre 
-                    },
+                    
                     libros {
-                        titulo
                         isbn
-                    },
-                    item_libro {
-                        uuid
-                        titulo
-                        sede
-                        valor
+                        autor
+                        idioma
+                        editorial
+                        formato
+                        fecha_publicacion
+                        genero
+                        edicion
+                        nro_paginas
                     },
                     juguetes {
                         nombre
+                        tema
+                        material_principal
+                        fuente_energia
                         modo_juego
+                        publico_objetivo
                     }
                 }
-                `, variables: {
-                    filtro: "{ \"titulo\": \"algorithms\"}"
-                }
+                `
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,8 +94,15 @@ const MainPage = () => {
         )
         .then(res => res.data)
         .catch(err => console.log(err));        
+        if (tipo === "juguetes"){
+            setData_out( response.data.libros);
+            columns = for_libros;
+        } else {
+            setData_out( response.data.juguetes);
+            columns = for_juguetes;
+            
+        }
         
-        setData_out( response.data.libros);
 
     }
     
@@ -103,8 +135,8 @@ const MainPage = () => {
                 <div class = "first-row">
                     <select name="t_product">
                         <option value="" selected disabled>Type</option>
-                        <option value="value_1">Book</option>
-                        <option value="value_2">Toy</option>
+                        <option value="libros">Book</option>
+                        <option value="juguetes">Toy</option>
                     </select>
                     
                     <input {...register("author")}/>
