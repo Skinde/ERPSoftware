@@ -4,9 +4,8 @@ import { UserContext, _cookies} from "../context/UserContext";
 import './../styles/App_Login.css';
 import { useNavigate } from "react-router-dom";
 
-const logo_style = { marginTop: '25px' }
 const logo = require('./../oficial_logo.png');
-
+const inv_image = require('./../logistics.png');
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -49,31 +48,42 @@ const Login = () => {
     };    
 
     return (
-        <div class="main-box">
-            <div style={logo_style}>
-                <img src={logo} width="360px" alt="Main logo" />
-            </div>
-    
-            <header>Employee Login</header>
+        <section className="all-login-wrapper">
             
-            <form onSubmit={handleSubmit} name="theForm">
-                <div className="ui form">
-                    <div className="txt_field">
-                        <input class="input_e" type="text" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
-                        <span class="bar-line"></span>
-                    </div>
-                     
-    
-                    <div className="txt_field">
-                        <input class="input_e" type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
-                        <span class="bar-line"></span>
-                    </div>
-                    
+            <div className="in-flex-login">
+                <div className="login-image-wrapper">
+                    <img className="login-img-1" src={inv_image} alt="."/>
                 </div>
-                
-                <input type="submit" value="Login" />
-            </form>
-        </div>
-        )
+            </div>
+
+            <div className="in-flex-login">
+                <div className="login-box">
+                    <div>
+                        <img className="logo-img-2" src={logo} alt="."/>
+                    </div>
+
+                    <header>Employee Login</header>
+
+                    <form onSubmit={handleSubmit} name="theForm">
+                        <div className="ui form">
+                            <div className="txt_field">
+                                <input class="input_e" type="text" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                                <span class="bar-line"></span>
+                            </div>
+                            
+                            <div className="txt_field">
+                                <input class="input_e" type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                                <span class="bar-line"></span>
+                            </div>
+                            
+                        </div>
+                        
+                        <input type="submit" value="Login" />
+                    </form>
+                </div>
+            </div>
+
+        </section>
+    )
 }
 export default Login;

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
 
 * {
     margin: 0;
@@ -15,25 +16,73 @@ body {
     background: #D9D9D9;
 }
 
+/* Flex items */
+.all-login-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.in-flex-login {
+    flex: 5;
+    min-height: 300px;
+}
+/* ------------------- */
+
+/* For images - responsive values */
+img { border-radius: 15px; }
+
+.login-image-wrapper { padding-right: 10px; }
+
+.login-img-1 {
+    width: 920px;
+    border-radius: 15px;
+}
+.logo-img-2 {
+    width: 360px;
+}
+
+@media (max-width: 1400px) {
+    .login-image-wrapper {
+        display: none;
+    }
+}
+@media (max-height: 600px) {
+    .login-img-1 {
+        width: 760px;
+    }
+    .logo-img-2 {
+        width: 220px;
+        margin-bottom: -30px;
+    }
+    .main-login-box header {
+        font-weight: 400;
+        margin-bottom: -50px;
+    }
+}
+/* ------------------- */
+
 /* Main box */
-.main-box{
+.login-box {
     width: 420px;
-    padding: 40px 30px 50px 30px;
+    padding: 30px 30px 30px 30px;
     text-align: center;
 
     background: white;
     box-shadow: 10px 10px 15px rgba(0,0,0,0.1);
     border-radius: 15px;
 }
-.main-box header{
-    font-size: 25px;
+.login-box header{
+    font-size: 20px;
     font-weight: 600;
     color: #2541b2;
 
     padding-top: 50px;
     padding-bottom: 25px;
 }
-.main-box form {
+.login-box form {
     padding: 0 20px;
     box-sizing: border-box;
 }
@@ -42,15 +91,18 @@ body {
 /* On form */
 input[type="text"] {
     color: #333;
-    width: 100%; 
+    width: 95%;
     box-sizing: border-box;
 }:focus{outline: none;}
+
 input[type="password"] {
     color: #333;
-    width: 100%; 
-    box-sizing: border-box; 
+    width: 95%;
+    box-sizing: border-box;
 }:focus{outline: none;}
 
+
+/* Inputs */
 .txt_field {
     float: left;
     width: 90%;
@@ -81,8 +133,8 @@ input[type="password"] {
 /* Empty fields errors */
 .error {
     color: #d23f2f;
-    margin-top: 5px;
-    padding-bottom: 10px;
+    margin-top: 2.5px;
+    padding-bottom: 5px;
 }
 /* ------------------- */
 

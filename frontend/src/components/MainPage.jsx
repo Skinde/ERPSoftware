@@ -57,6 +57,9 @@ const customStyles = {
 const paginationOptions = { rowsPerPageText: '' }
 */
 const MainPage = () => {
+
+    //let s_type, i_author, i_tittle;
+
     const [token, setToken] = useContext(UserContext);
 
     const navigate = useNavigate();
@@ -113,6 +116,11 @@ const MainPage = () => {
     
     const handlequery = (e) =>{ 
         e.preventDefault();
+
+        //s_type = document.getElementById("type_select").value;
+        //i_author = document.getElementById("author_input").value;
+        //i_tittle = document.getElementById("tittle_input").value;
+
         get_elementos();
     }
 
@@ -121,7 +129,6 @@ const MainPage = () => {
         navigate("/"); 
     }   
     return (
-        
         <div class="wrapper" >     
             <div class="image_wrapper">
                 <div class="side_image">
@@ -137,31 +144,31 @@ const MainPage = () => {
 
             <form class="all-inputs">
                 <div class = "first-row">
-                    <select name="t_product">
+                    <select name="t_product" id="type_select">
                         <option value="" selected disabled>Type</option>
-                        <option value="value_1">Book</option>
-                        <option value="value_2">Toy</option>
+                        <option value="Book">Book</option>
+                        <option value="Toy">Toy</option>
                     </select>
                     
-                    <input class="input_1" type="text" placeholder="Author"/>
-                    <input class="input_1" type="text" placeholder="Book Tittle"/>
+                    <input class="input_1" type="text" placeholder="Author" id="author_input"/>
+                    <input class="input_1" type="text" placeholder="Book Tittle" id="tittle_input"/>
                 </div>
 
                 <div class = "second-row">
-                    <input type="text" placeholder="Publisher"/>
-                    <input type="text" placeholder="Edition"/>
+                    <input type="text" placeholder="Publisher" id="publisher_input"/>
+                    <input type="text" placeholder="Edition" id="edition_input"/>
 
-                    <select name="t_product">
+                    <select name="t_genre" id="genre_select">
                         <option value="" selected disabled>Genre</option>
-                        <option value="value_1">Action</option>
-                        <option value="value_2">Adventure</option>
-                        <option value="value_3">Education</option>
+                        <option value="Action">Action</option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="Education">Education</option>
                     </select>
                 </div>
 
                 <div class="third-row">
-                    <input type="text" placeholder="Year"/>
-                    <input type="text" placeholder="ISBN"/>
+                    <input type="text" placeholder="Year" id="year_input"/>
+                    <input type="text" placeholder="ISBN" id="isbn_input"/>
                 </div>
 
                 <input type="submit" value="Search" onClick={handlequery}/>
@@ -182,7 +189,6 @@ const MainPage = () => {
                         </tbody>
                     </table>
             </div>
-            
         </div>
     )
 }
