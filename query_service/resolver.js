@@ -140,7 +140,7 @@ const resolvers = {
     // NEW
     filter_libro: async({ filter }, context) => {
         filter = JSON.parse(JSON.stringify(filter));
-        console.log(`\tPARSED QUERY ${filter}`);
+        console.log(`\tPARSED QUERY\n${JSON.stringify(filter)}`);
         // PARSE parameter of GraphQL query
         let filter_funcs = parse_query_arg(filter);
         console.log(`\tFILTER ARRAY`);
