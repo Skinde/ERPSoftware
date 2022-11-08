@@ -24,9 +24,9 @@ app.use(async (req, res, next) => {
 
     if (!req.headers['authorization']) {
         req.headers['authorization'] = `${process.env.JWT_TOKEN_TYPE} ${process.env.JWT_AUTH_TOKEN}`;
-        console.log("\tautorizacion de desarrollo");
+        console.log("\tdevelopment auth");
     } else {
-        console.log("\tautorizado");
+        console.log("\tlogin auth");
     }
     
     console.log(`${req.method} ${req.url} \t ${cDate}`);
