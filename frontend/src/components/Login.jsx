@@ -3,18 +3,16 @@ import { useState, useContext } from "react";
 import { UserContext, _cookies} from "../context/UserContext"; 
 import './../styles/App_Login.css';
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
 
-
-const logo_style = { marginTop: '25px' }
 const logo = require('./../oficial_logo.png');
-
+const inv_image = require('./../logistics.png');
 
 const Login = () => {
-    const { register, handleSubmit, getValues, formState: {errors} } = useForm();
-
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    /*const [formErrors, setFormErrors] = useState({});
+    const [isSubmit, setIsSubmit] = useState(false);*/
     const [, setToken] = useContext(UserContext);
-
 
     const submitLogin = async () => {
         
@@ -23,7 +21,7 @@ const Login = () => {
                 headers: {"Content-Type": "application/x-www-form-urlencoded",
                          'accept': 'application/json',},                
                 body: JSON.stringify(
-                    `grant_type=&username=${getValues("email")}&password=${getValues("password")}&scope=&client_id=&client_secret=`
+                    `grant_type=&username=${email}&password=${password}&scope=&client_id=&client_secret=`
                 ),
             };
             
@@ -41,8 +39,8 @@ const Login = () => {
 
     const navigate = useNavigate();    
     
-    const handleSubmission = (e) => {
-        //e.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
         submitLogin();
         if (_cookies.get("user_Token") != null) {
             navigate("/Home");
@@ -50,34 +48,42 @@ const Login = () => {
     };    
 
     return (
-        <div class="main-box">
-            <div style={logo_style}>
-                <img src={logo} width="360px" alt="Main logo" />
-            </div>
-    
-            <header>Employee Login</header>
+        <section className="all-login-wrapper">
             
-            <form onSubmit={handleSubmit(handleSubmission)} name="theForm">
-                <div className="ui form">
-                    <div className="txt_field">
-                        <input class="input_e"  {...register("email", {required: true} )}/>                        
-                        <span class="bar-line"></span>
-                        
-
-                    </div>
-                     
-    
-                    <div className="txt_field">
-                        <input class="input_e" type="password" {...register("password", {required: true})} />                        
-                        <span class="bar-line"></span>
-                        
-                    </div>
-                    
+            <div className="in-flex-login">
+                <div className="login-image-wrapper">
+                    <img className="login-img-1" src={inv_image} alt="."/>
                 </div>
-                
-                <input type="submit" value="Login" />
-            </form>
-        </div>
-        )
+            </div>
+
+            <div className="in-flex-login">
+                <div className="login-box">
+                    <div>
+                        <img className="logo-img-2" src={logo} alt="."/>
+                    </div>
+
+                    <header>Employee Login</header>
+
+                    <form onSubmit={handleSubmit} name="theForm">
+                        <div className="ui form">
+                            <div className="txt_field">
+                                <input class="input_e" type="text" name="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                                <span class="bar-line"></span>
+                            </div>
+                            
+                            <div className="txt_field">
+                                <input class="input_e" type="password" name="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                                <span class="bar-line"></span>
+                            </div>
+                            
+                        </div>
+                        
+                        <input type="submit" value="Login" />
+                    </form>
+                </div>
+            </div>
+
+        </section>
+    )
 }
 export default Login;

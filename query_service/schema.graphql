@@ -73,6 +73,10 @@ input Filter {
 
 type Query {
     test: String
+    libros: [Libro]
+    juguetes: [Juguete]
+    item_juguete: [Item_Juguete]
+    item_libro: [Item_Libro]
     # NEW
     filter_libro(filter: FilterAND): [Libro]
     filter_juguete(filter: FilterAND): [Juguete]

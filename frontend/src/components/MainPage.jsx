@@ -50,6 +50,9 @@ const customStyles = {
 }
 const paginationOptions = { rowsPerPageText: '' }
 const MainPage = () => {
+
+    //let s_type, i_author, i_tittle;
+
     const [token, setToken] = useContext(UserContext);
     const [data_out, setData_out] = useState([]); 
     const { register, handleSubmit, getValues, formState: {errors} } = useForm();
@@ -238,6 +241,11 @@ const MainPage = () => {
     
     const handlequery = (e) =>{ 
         e.preventDefault();
+
+        //s_type = document.getElementById("type_select").value;
+        //i_author = document.getElementById("author_input").value;
+        //i_tittle = document.getElementById("tittle_input").value;
+
         get_elementos();
     }
 
@@ -246,7 +254,6 @@ const MainPage = () => {
         navigate("/"); 
     }   
     return (
-        
         <div class="wrapper" >     
             <div class="image_wrapper">
                 <div class="side_image">
@@ -306,7 +313,6 @@ const MainPage = () => {
                         />
                 </div>
             </div>
-            
         </div>
     )
 }
