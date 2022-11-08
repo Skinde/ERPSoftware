@@ -12,6 +12,7 @@ const l_icon = require('./../oficial_icon.png');
 
 
 let columns = [];
+
 const for_juguetes = [
     { name: "Nombre", selector: row => row.nombre, sortable: true, center: false, left: true, grow: 1.5 },    
     { name: "Modo de juego", selector: row => row.modo_juego, sortable: false, center: false, right: true },
@@ -20,6 +21,7 @@ const for_juguetes = [
     { name: "Fuente de energía", selector: row => row.fuente_energia, sortable: false, center: false, right: true },
     { name: "Material principal", selector: row => row.material_principal, sortable: false, center: false, right: true },
 ];
+
 
 const for_libros = [
     { name: "Titulo", selector: row => row.titulo, sortable: true, center: false, left: true, grow: 1.5 },    
@@ -51,20 +53,106 @@ const MainPage = () => {
     const [token, setToken] = useContext(UserContext);
     const [data_out, setData_out] = useState([]); 
     const { register, handleSubmit, getValues, formState: {errors} } = useForm();
-    let tipo = ""; 
+    let tipo, titulo, autor, editorial, genero, isbn, edicion; 
+    let nombre, modo_juego, tema, publico_objetivo, fuente_energia, material_principal; 
 
+    let queries,variable ;
     const navigate = useNavigate();
 
 
 
     const get_elementos = async () => {
-        const response =  await axios.post(
-            'http://127.0.0.1:4000/graphql', 
-            {
-                query: `
+
+        tipo = document.getElementById("type_select").value;
+        
+        
+        let titulos = [];
+        let nombres = []
+
+        if (tipo == "juguetes"){
+            nombre = document.getElementById("title_input").value; 
+            modo_juego = document.getElementById("author_input").value;
+            tema = document.getElementById("publisher_input").value; 
+            publico_objetivo = document.getElementById("genre_input").value; 
+            fuente_energia = document.getElementById("isbn_input").value ;
+            material_principal = document.getElementById("edition_input").value ;
+            queries = `
+            query ($filter: FilterAND){
+                filter_juguete(filter: $filter)	{
+                     nombre
+                     modo_juego
+                     publico_objetivo
+                     tema
+                     fuente_energia
+                     material_principal
+                   }
+               }
+               
+               
+               
+               
+            `
+            for(var nom of nombre.split(" ")){
+                nombres.push(
+                    {"field": "nombre",
+                    "contains": nom
+                    }      );
+            }
+
+            variable = {
+            "filter": {
+                "and": [
                 {
-                    
-                    libros {
+                    "or": nombres
+                }, 
+                {
+                    "or": [
+                    {
+                        "field": "modo_juego",
+                        "contains": modo_juego
+                    }
+                    ]
+                }, 
+                {
+                    "or": [
+                    {
+                        "field": "publico_objetivo",
+                        "contains": publico_objetivo
+                    }
+                    ]
+                }, 
+                {
+                    "or": [
+                    {
+                        "field": "fuente_energia",
+                        "contains": fuente_energia
+                    }
+                    ]
+                }, 
+                {
+                    "or": [
+                    {
+                        "field": "material_principal",
+                        "contains": material_principal
+                    }
+                    ]
+                }
+                ]
+                }
+            }
+            columns = for_juguetes;
+        } 
+        
+        else {            
+            titulo = document.getElementById("title_input").value ;
+            autor = document.getElementById("author_input").value;
+            editorial = document.getElementById("publisher_input").value; 
+            genero = document.getElementById("genre_input").value; 
+            isbn = document.getElementById("isbn_input").value ;
+            edicion = document.getElementById("edition_input").value ;
+            queries = `
+                query($filter: FilterAND) {
+                    filter_libro(filter : $filter){                                        
                         isbn
                         autor
                         idioma
@@ -73,19 +161,60 @@ const MainPage = () => {
                         fecha_publicacion
                         genero
                         edicion
-                        nro_paginas
+                        nro_paginas    
+                        titulo                
+                    },                    
+                }                
+            `            
+            
+            for(var tit of titulo.split(" ")){
+                titulos.push(
+                    {"field": "titulo",
+                    "contains": tit
+                    }      );
+            }
+            variable = {
+                "filter": {
+                  "and": [
+                    {
+                      "or": titulos
                     },
-                    juguetes {
-                        nombre
-                        tema
-                        material_principal
-                        fuente_energia
-                        modo_juego
-                        publico_objetivo
-                    }
+                    {
+                      "or": [
+                        {"field": "editorial",
+                          "contains": editorial
+                        }
+                      ]
+                    },
+                    {
+                      "or": [
+                        {"field": "isbn",
+                          "contains": isbn
+                        }
+                      ]
+                    },
+                    {
+                        "or": [
+                          {"field": "autor",
+                            "contains": autor
+                          }
+                        ]
+                      }
+                  ]	
                 }
-                `
-            }, {
+          };
+            columns = for_libros;
+            
+        }
+
+
+        const response =  await axios.post(
+            'http://127.0.0.1:4000/graphql', 
+            {
+                query: queries, 
+                variables: variable
+        } 
+            ,{
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: "Bearer " + token,
@@ -93,14 +222,14 @@ const MainPage = () => {
             }
         )
         .then(res => res.data)
-        .catch(err => console.log(err));        
+        .catch(err => console.log(err));     
+        console.log(response.data);
+
         if (tipo === "juguetes"){
-            setData_out( response.data.libros);
-            columns = for_libros;
-        } else {
-            setData_out( response.data.juguetes);
-            columns = for_juguetes;
             
+            setData_out(response.data.filter_juguete);            
+        } else {                        
+            setData_out(response.data.filter_libro);            
         }
         
 
@@ -133,31 +262,31 @@ const MainPage = () => {
 
             <form class="all-inputs">
                 <div class = "first-row">
-                    <select name="t_product">
+                    <select name="t_product" id="type_select">
                         <option value="" selected disabled>Type</option>
                         <option value="libros">Book</option>
                         <option value="juguetes">Toy</option>
                     </select>
                     
-                    <input {...register("author")}/>
-                    <input {...register("book tittle")}/>
+                    <input class="input_1" type="text" placeholder="Author" id="author_input"/>
+                    <input class="input_1" type="text" placeholder="Book Title" id="title_input"/>
                 </div>
 
                 <div class = "second-row">
-                    <input type="text" placeholder="Publisher"/>
-                    <input type="text" placeholder="Edition"/>
+                    <input type="text" placeholder="Publisher" id="publisher_input"/>
+                    <input type="text" placeholder="Edition" id="edition_input"/>
 
-                    <select name="t_product">
+                    <select name="t_product" id="genre_input" >
                         <option value="" selected disabled>Genre</option>
-                        <option value="value_1">Action</option>
-                        <option value="value_2">Adventure</option>
-                        <option value="value_3">Education</option>
+                        <option value="accion">Action</option>
+                        <option value="aventura">Adventure</option>
+                        <option value="educacion">Education</option>
                     </select>
                 </div>
 
                 <div class="third-row">
-                    <input type="text" placeholder="Year"/>
-                    <input type="text" placeholder="ISBN"/>
+                    <input type="text" placeholder="Year" id="year_input"/>
+                    <input type="text" placeholder="ISBN" id="isbn_input"/>
                 </div>
 
                 <input type="submit" value="Search" onClick={handlequery}/>
