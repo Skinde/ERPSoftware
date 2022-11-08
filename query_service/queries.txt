@@ -1,60 +1,84 @@
-{
-  getBooks {
-    uuid
-    titulo
-  },
-  getToys() {
-    uuid
-    nombre
-  }
+
+query ($filter: FilterAND){
+ filter_juguete(filter: $filter)	{
+  	nombre
+  	publico_objetivo
+  	tema
+	}
 }
 
 {
-  libros_filter(filter: "{\"titulo\": \"algorithms\"}"){
-    titulo
-  }
-}	
+  "filter": {
+  	"and": [
+      {
+        "or": [
+          {
+            "field": "nombre",
+            "contains": "mobile"
+          },
+          {
+            "field": "nombre",
+            "contains": "penguin"
+        	}
+        ]
+      }  
+    ]
+	}
+}
 
+// ---------------------------------
+
+query ($filter: FilterAND){
+ filter_libro(filter: $filter)	{
+  	titulo
+  	isbn
+  	autor
+	}
+}
 
 {
-  libros_filter(filter: "{\"titulo\": \"bob\"}"){
-    titulo
-  }
-}	
+  "filter": {
+  	"and": [
+      {
+        "or": [
+          {
+            "field": "titulo",
+            "contains": "learning"
+          }
+        ]
+      }  
+    ]
+	}
+}
+
+// ----------------------------------
+
+query ($filter: FilterAND){
+ filter_libro(filter: $filter)	{
+  	titulo
+  	isbn
+  	autor
+  	idioma
+  	formato
+  	fecha_publicacion
+	}
+}
 
 {
-  item_libro {
-    uuid
-    titulo
-    fecha_adquisicion
-  },
-  libros_filter(filter: "{\"titulo\": \"Algorithms\"}"){
-    titulo
-  }
-}	
-
-{
-  libros {
-    titulo
-    isbn
-    autor
-  }
-  juguetes {
-    nombre
-    modo_juego
-  }
-  item_libro {
-    uuid
-    titulo
-    sede
-    valor
-  }
-  item_juguete {
-    uuid
-    nombre
-  }
-  libros_filter (filter: "{ \"titulo\": \"algorithms\"}"){
-    titulo
-    isbn
-  }
+  "filter": {
+  	"and": [
+      {
+        "or": [
+          {
+            "field": "titulo",
+            "contains": "algorith"
+          },
+          {
+            "field": "idioma",
+            "eq": "es"
+          }
+        ]
+      }
+    ]
+	}
 }

@@ -140,10 +140,12 @@ const resolvers = {
     // NEW
     filter_libro: async({ filter }, context) => {
         filter = JSON.parse(JSON.stringify(filter));
-        
+        console.log(`\tPARSED QUERY ${filter}`);
         // PARSE parameter of GraphQL query
         let filter_funcs = parse_query_arg(filter);
-        console.log(`\tFILTER ARRAY\n${filter_funcs}`);
+        console.log(`\tFILTER ARRAY`);
+        for (const [func] of filter_funcs)
+            console.log(func);
 
         // GET libros FROM centralAPI OR RedisCache
         let libros = await get_data("Libros", "/api/libros", context['auth']);

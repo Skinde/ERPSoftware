@@ -284,7 +284,10 @@ async def get_books(
         books =  db.query(_models.Libro).limit(limit).offset(paging).all()
         
         response = []
-        for book in books:         
+        for book in books:
+            if book.fecha_publicacion is not None:
+                # print(type(book.fecha_publicacion), book.fecha_publicacion.year)
+                book.fecha_publicacion = book.fecha_publicacion.year
             response.append(book.__dict__)
         
         return {
