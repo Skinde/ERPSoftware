@@ -56,7 +56,7 @@ const MainPage = () => {
     const [token, setToken] = useContext(UserContext);
     const [data_out, setData_out] = useState([]); 
     const { register, handleSubmit, getValues, formState: {errors} } = useForm();
-    let tipo, titulo, autor, editorial, genero, isbn, edicion; 
+    let tipo, titulo, autor, editorial, genero, isbn, edicion, year; 
     let nombre, modo_juego, tema, publico_objetivo, fuente_energia, material_principal; 
 
     let queries,variable ;
@@ -90,12 +90,9 @@ const MainPage = () => {
                      material_principal
                    }
                }
-               
-               
-               
-               
+
             `
-            for(var nom of nombre.split(" ")){
+            for(var nom of nombre.split(", ")){
                 nombres.push(
                     {"field": "nombre",
                     "contains": nom
@@ -153,6 +150,7 @@ const MainPage = () => {
             genero = document.getElementById("genre_input").value; 
             isbn = document.getElementById("isbn_input").value ;
             edicion = document.getElementById("edition_input").value ;
+            year = document.getElementById("year_input").value;
             queries = `
                 query($filter: FilterAND) {
                     filter_libro(filter : $filter){                                        
@@ -170,12 +168,14 @@ const MainPage = () => {
                 }                
             `            
             
-            for(var tit of titulo.split(" ")){
+            for(var tit of titulo.split(", ")){
                 titulos.push(
                     {"field": "titulo",
                     "contains": tit
-                    }      );
+                    }      
+                );
             }
+
             variable = {
                 "filter": {
                   "and": [
@@ -202,7 +202,7 @@ const MainPage = () => {
                             "contains": autor
                           }
                         ]
-                      }
+                    }
                   ]	
                 }
           };
