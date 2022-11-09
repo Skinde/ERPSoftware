@@ -1,13 +1,9 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
-const { createClient } = require('redis');
+const Redis = require('ioredis');
 dotenv.config();
 
-const client = createClient({
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
-});
-client.on('error', (err) => console.log('redis-cli error', err));
+const redis = new Redis();
 
 const instance = axios.create({
     baseURL: process.env.API_HOST,
@@ -61,12 +57,13 @@ const exec_filters = (obj, filters) => {
 }
 
 const get_data = async (key, endpoint, jwt) => {
-    // try {
+    try {
         // WITH REDIS
-        // const reply = await client.get(key);
-        // if (reply)
-        //     return JSON.parse(reply);
-        // else {
+        const reply = await redis.get(key);
+        if (reply){
+            return JSON.parse(reply);
+        }
+        else {
             // WITHOUT REDIS
             let response_data = await instance.get(endpoint, {
                 headers: {
@@ -78,16 +75,12 @@ const get_data = async (key, endpoint, jwt) => {
             
             let response = response_data[key];
             // SAVE DATA ON REDIS
-            // const reply = await client.set(key, JSON.stringify(response), {
-            //     EX: 300,
-            // });
-            // console.log(reply);
-
+            await redis.set(key, JSON.stringify(response), 'EX', 300);
             return response;
-    //     }
-    // } catch (error) {
-    //     console.log(error);
-    // }
+        }
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 const resolvers = {

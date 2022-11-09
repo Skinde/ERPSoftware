@@ -73,13 +73,31 @@ app.get('/items', async (req, res) => {
 })
 
 // GRAPHQL
+
+const extensions = ({
+    document,
+    variables,
+    operationName,
+    result,
+    context,
+}) => {
+    const response_time = Date.now() - context.startTime;
+    const k_bytes = new TextEncoder().encode(JSON.stringify(result)).length * 0.001;
+    return {
+        runTime: `${response_time} ms`,
+        responseSize: `${k_bytes} KB`
+    }
+};
+
 app.use('/graphql', graphqlHTTP((req) => ({
     schema: typeDefs,
     rootValue: resolvers,
     graphiql: true,
     context: {
-        auth: req.headers["authorization"]
-    }
+        auth: req.headers["authorization"],
+        startTime: Date.now()
+    },
+    extensions
 })));
 
 app.listen(app.get('port'), () => {
