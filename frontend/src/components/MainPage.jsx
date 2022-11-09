@@ -26,8 +26,7 @@ const for_juguetes = [
 const for_libros = [
     { name: "Titulo", selector: row => row.titulo, sortable: true, center: false, left: true, grow: 1.5 },    
     { name: "ISBN", selector: row => row.isbn, sortable: false, center: false, right: true },
-    { name: "Autor", selector: row => row.autor, sortable: false, center: false, right: true },
-    { name: "Idioma", selector: row => row.idioma, sortable: false, center: false, right: true },
+    { name: "Autor", selector: row => row.autor, sortable: false, center: false, right: true },    
     { name: "Editorial", selector: row => row.editorial, sortable: false, center: false, right: true },
     { name: "Formato", selector: row => row.formato, sortable: false, center: false, right: true },
     { name: "Fecha de publicación", selector: row => row.fecha_publicacion, sortable: false, center: false, right: true },
@@ -151,6 +150,7 @@ const MainPage = () => {
             isbn = document.getElementById("isbn_input").value ;
             edicion = document.getElementById("edition_input").value ;
             year = document.getElementById("year_input").value;
+            
             queries = `
                 query($filter: FilterAND) {
                     filter_libro(filter : $filter){                                        
@@ -205,11 +205,18 @@ const MainPage = () => {
                     },
                     {
                         "or": [
-                          {"field": "fecha_publicacion",
-                            "contains": year
+                          {"field": "genero",
+                            "contains": genero
                           }
                         ]
-                    },                   
+                    },
+                    {
+                        "or": [
+                          {"field": "edicion",
+                            "contains": edicion
+                          }
+                        ]
+                    }
                   ]	
                 }
           };
