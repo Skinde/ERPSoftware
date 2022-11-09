@@ -202,7 +202,14 @@ const MainPage = () => {
                             "contains": autor
                           }
                         ]
-                    }
+                    },
+                    {
+                        "or": [
+                          {"field": "fecha_publicacion",
+                            "contains": year
+                          }
+                        ]
+                    },                   
                   ]	
                 }
           };
