@@ -6,7 +6,6 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { useForm } from "react-hook-form";
 
-const l_icon_style = {marginTop: '6px'}
 const l_icon = require('./../oficial_icon.png');
 
 
@@ -48,6 +47,9 @@ const customStyles = {
     },
 }
 const paginationOptions = { rowsPerPageText: '' }
+
+var isFirefox = typeof InstallTrigger !== 'undefined';
+
 const MainPage = () => {
 
     //let s_type, i_author, i_tittle;
@@ -60,8 +62,6 @@ const MainPage = () => {
 
     let queries,variable ;
     const navigate = useNavigate();
-
-
 
     const get_elementos = async () => {
 
@@ -308,7 +308,6 @@ const MainPage = () => {
 
     }
     
-    
     const handlequery = (e) =>{ 
         e.preventDefault();
 
@@ -322,56 +321,112 @@ const MainPage = () => {
     const handleClickLogOut = (e) => { 
         setToken(null)              
         navigate("/"); 
-    }   
+    }
+
+    //For browser
+    const [val] = React.useState(isFirefox);
+
+    //For select values
+    let author_place = "Author (Alt + a)"; let author_place_s = "Author (Alt + shift + a)";
+    let tittle_place = "Book tittle (Alt + t)"; let tittle_place_s = "Book tittle (Alt + shift + t)";
+    let publisher_place = "Publisher (Alt + p)"; let publisher_place_s = "Publisher (Alt + shift + p)";
+    let edition_place = "Edition (Alt + k)"; let edition_place_s = "Edition (Alt + shift + k)"
+    let year_place = "Year (Alt + y)"; let year_place_s = "Year (Alt + shift + y)";
+    let isbn_place = "ISBN (Alt + i)"; let isbn_place_s = "ISBN (Alt + shift + i";
+
+    function forToysSearch(value) {
+        let ts = document.getElementById("type_select").value;
+        if (ts == "Book") {
+            if (!val) {
+                document.getElementById("author_input").placeholder = author_place;
+                document.getElementById("tittle_input").placeholder = tittle_place;
+                document.getElementById("publisher_input").placeholder = publisher_place;
+                document.getElementById("edition_input").placeholder = edition_place;
+                document.getElementById("year_input").placeholder = year_place;
+                document.getElementById("isbn_input").placeholder = isbn_place;
+            } else {
+                document.getElementById("author_input").placeholder = author_place_s;
+                document.getElementById("tittle_input").placeholder = tittle_place_s;
+                document.getElementById("publisher_input").placeholder = publisher_place_s;
+                document.getElementById("edition_input").placeholder = edition_place_s;
+                document.getElementById("year_input").placeholder = year_place_s;
+                document.getElementById("isbn_input").placeholder = isbn_place_s;
+            }
+        } else {
+            if (!val) {
+                document.getElementById("author_input").placeholder = "Nombre (Alt + a)";
+                document.getElementById("tittle_input").placeholder = "Tema (Alt + t)";
+                document.getElementById("publisher_input").placeholder = "Material (Alt + p)";
+                document.getElementById("edition_input").placeholder = "Energía (Alt + k)";
+                document.getElementById("year_input").placeholder = "Publico (Alt + y)"
+                document.getElementById("isbn_input").placeholder = "Modo (Alt + i)";
+            } else {
+                document.getElementById("author_input").placeholder = "Nombre (Alt + shift + a)";
+                document.getElementById("tittle_input").placeholder = "Tema (Alt + shift + t)";
+                document.getElementById("publisher_input").placeholder = "Material (Alt + shift + p)";
+                document.getElementById("edition_input").placeholder = "Energia (Alt + shift + k)";
+                document.getElementById("year_input").placeholder = "Publico (Alt + shift + y)"
+                document.getElementById("isbn_input").placeholder = "Modo (Alt + shift + i)";
+            }
+        }
+    }
+
     return (
-        <div class="wrapper" >     
-            <div class="image_wrapper">
-                <div class="side_image">
-                    <div style={l_icon_style}>
-                        <img src={l_icon} width="125px" alt="Side Icon"/>
+        <section className="all-main-wrapper">
+            <div className="main-container-box">
+                <div className="top-left">                    
+                    <div className="side-image">
+                        <img src={l_icon} className="side-icon" alt="icon"/>
                     </div>
+
+                    <button class="logout-button" onClick={handleClickLogOut}>
+                        <span class="glyphicon glyphicon-log-out"></span> Log Out
+                    </button>
+
                 </div>
 
-                <button class="logout-button" onClick={handleClickLogOut}>
-                    <span class="glyphicon glyphicon-log-out"></span> Log Out
-                </button>
-            </div>
+                <div className="top-right">
+                    <form className="all-inputs">
+                        <div className="first-row">
+                            <select name="t_product" id="type_select" onChange={forToysSearch}>
+                                <option value="Book" selected>Book</option>
+                                <option value="Toy">Toy</option>
+                            </select>   
 
-            <form class="all-inputs">
-                <div class = "first-row">
-                    <select name="t_product" id="type_select">
-                        <option value="" selected disabled>Type</option>
-                        <option value="libros">Book</option>
-                        <option value="juguetes">Toy</option>
-                    </select>
-                    
-                    <input class="input_1" type="text" placeholder="Author" id="author_input"/>
-                    <input class="input_1" type="text" placeholder="Book Title" id="title_input"/>
+                            { val ? <input type="text" placeholder={author_place_s} id="author_input" accessKey="a"/>:
+                                <input type="text" placeholder={author_place} id="author_input" accessKey="a"/> }
+                            { val ? <input type="text" placeholder="Book tittle (Alt + shift + t)" id="tittle_input" accessKey="t"/>:
+                                <input type="text" placeholder="Book tittle (Alt + t)" id="tittle_input" accessKey="t"/> }
+                            
+                        </div>
+
+                        <div className="second-row">
+                            <select name="t_genre" id="genre_select">
+                                <option value="" selected disabled>Genre</option>
+                                <option value="Action" id="genre_select_v1">Action</option>
+                                <option value="Adventure">Adventure</option>
+                                <option value="Education">Education</option>
+                            </select>
+
+                            { val ? <input type="text" placeholder="Publisher (Alt + shift + p)" id="publisher_input" accessKey="p"/>:
+                                <input type="text" placeholder="Publisher (Alt + p)" id="publisher_input" accessKey="p"/> }
+                            { val ?  <input type="text" placeholder="Edition (Alt + shift + k)" id="edition_input" accessKey="k"/>:
+                                <input type="text" placeholder="Edition (Alt + k)" id="edition_input" accessKey="k"/> }
+                        </div>
+
+                        <div className="third-row">
+                            { val ? <input type="number" placeholder="Year (Alt + shift + y)" id="year_input" accessKey="y"/>:
+                                <input type="number" placeholder="Year (Alt + y)" id="year_input" accessKey="y"/> }
+                            { val ? <input type="text" placeholder="ISBN (Alt + shift + i)" id="isbn_input" accessKey="i"/>:
+                                <input type="text" placeholder="ISBN (Alt + i)" id="isbn_input" accessKey="i"/>}
+                            
+                        </div>
+                        <input type="submit" value="Search" onClick={handlequery}/>
+                    </form>
                 </div>
 
-                <div class = "second-row">
-                    <input type="text" placeholder="Publisher" id="publisher_input"/>
-                    <input type="text" placeholder="Edition" id="edition_input"/>
-
-                    <select name="t_product" id="genre_input" >
-                        <option value="" selected disabled>Genre</option>
-                        <option value="accion">Action</option>
-                        <option value="aventura">Adventure</option>
-                        <option value="educacion">Education</option>
-                    </select>
-                </div>
-
-                <div class="third-row">
-                    <input type="text" placeholder="Year" id="year_input"/>
-                    <input type="text" placeholder="ISBN" id="isbn_input"/>
-                </div>
-
-                <input type="submit" value="Search" onClick={handlequery}/>
-            </form>
-
-            <div class="Results-Wrapper">
-            
-                <div class="For-table">
+                <div className="results-wrapper">
+                    <div class="table-content">
                         <DataTable
                             columns={columns}
                             data={data_out}
@@ -381,9 +436,10 @@ const MainPage = () => {
                             paginationRowsPerPageOptions={[]}
                             fixedHeader
                         />
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
     )
 }
 
