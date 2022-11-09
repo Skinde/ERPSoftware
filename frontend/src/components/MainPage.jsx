@@ -362,7 +362,7 @@ const MainPage = () => {
                 document.getElementById("isbn_input").placeholder = "Modo (Alt + i)";
             } else {
                 document.getElementById("author_input").placeholder = "Nombre (Alt + shift + a)";
-                document.getElementById("tittle_input").placeholder = "Tema (Alt + shift + t)";
+                document.getElementById("title_input").placeholder = "Tema (Alt + shift + t)";
                 document.getElementById("publisher_input").placeholder = "Material (Alt + shift + p)";
                 document.getElementById("edition_input").placeholder = "Energia (Alt + shift + k)";
                 document.getElementById("year_input").placeholder = "Publico (Alt + shift + y)"
@@ -395,13 +395,13 @@ const MainPage = () => {
 
                             { val ? <input type="text" placeholder={author_place_s} id="author_input" accessKey="a"/>:
                                 <input type="text" placeholder={author_place} id="author_input" accessKey="a"/> }
-                            { val ? <input type="text" placeholder="Book tittle (Alt + shift + t)" id="tittle_input" accessKey="t"/>:
-                                <input type="text" placeholder="Book tittle (Alt + t)" id="tittle_input" accessKey="t"/> }
+                            { val ? <input type="text" placeholder="Book tittle (Alt + shift + t)" id="title_input" accessKey="t"/>:
+                                <input type="text" placeholder="Book tittle (Alt + t)" id="title_input" accessKey="t"/> }
                             
                         </div>
 
                         <div className="second-row">
-                            <select name="t_genre" id="genre_select">
+                            <select name="t_genre" id="genre_input">
                                 <option value="" selected disabled>Genre</option>
                                 <option value="Action" id="genre_select_v1">Action</option>
                                 <option value="Adventure">Adventure</option>
