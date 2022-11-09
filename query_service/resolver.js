@@ -11,7 +11,7 @@ const instance = axios.create({
 });
 
 const op = {
-    eq : (f, s) => f === s,
+    eq : (f, s) => f == s,
     gte: (f, s) => f >= s,
     gt: (f, s) => f > s,
     lte: (f, s) => f <= s,

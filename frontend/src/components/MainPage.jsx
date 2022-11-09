@@ -136,6 +136,7 @@ const MainPage = () => {
                     }
                     ]
                 }
+                
                 ]
                 }
             }
@@ -214,6 +215,13 @@ const MainPage = () => {
                         "or": [
                           {"field": "edicion",
                             "contains": edicion
+                          }
+                        ]
+                    },
+                    {
+                        "or": [
+                          {"field": "fecha_publicacion",
+                            "eq": year
                           }
                         ]
                     }
