@@ -6,6 +6,9 @@
 - https://developer.okta.com/blog/2019/02/14/modern-token-authentication-in-node-with-express
 - https://melvingeorge.me/blog/get-all-the-contents-from-file-as-string-nodejs
 - https://www.contentful.com/blog/2021/01/14/graphql-via-http-in-five-ways/
+- https://zwbetz.com/get-the-approximate-size-of-a-js-object-in-bytes/
+- https://github.com/graphql/express-graphql#options
+- https://github.com/graphql/graphiql/issues/29
 
 `resolvers.js`
 - https://stackoverflow.com/questions/1098040/checking-if-a-key-exists-in-a-javascript-object
@@ -24,13 +27,7 @@
 - https://stackoverflow.com/questions/58689333/how-to-pass-arguments-to-graphqlhttp-middleware
 - https://www.anycodings.com/1questions/831451/how-to-pass-arguments-to-graphqlhttp-middleware
 - https://www.netlify.com/blog/2020/12/21/send-graphql-queries-with-the-fetch-api-without-using-apollo-urql-or-other-graphql-clients/
-
 - https://graphql.org/learn/queries/
-- https://graphql.org/graphql-js/basic-types/
-- https://graphql.org/graphql-js/constructing-types/
-- https://graphql.org/graphql-js/passing-arguments/
-- https://graphql.org/graphql-js/authentication-and-express-middleware/
-- https://graphql.org/graphql-js/graphql-clients/
 - https://www.apollographql.com/blog/graphql/examples/4-simple-ways-to-call-a-graphql-api/
 - https://graphql.org/blog/rest-api-graphql-wrapper/
 - https://hasura.io/learn/graphql/intro-graphql/graphql-queries/

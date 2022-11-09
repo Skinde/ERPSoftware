@@ -234,6 +234,7 @@ const MainPage = () => {
         .then(res => res.data)
         .catch(err => console.log(err));     
         console.log(response.data);
+        console.log(response);
 
         if (tipo === "juguetes"){
             
