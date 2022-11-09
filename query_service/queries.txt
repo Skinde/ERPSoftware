@@ -1,0 +1,84 @@
+
+query ($filter: FilterAND){
+ filter_juguete(filter: $filter)	{
+  	nombre
+  	publico_objetivo
+  	tema
+	}
+}
+
+{
+  "filter": {
+  	"and": [
+      {
+        "or": [
+          {
+            "field": "nombre",
+            "contains": "mobile"
+          },
+          {
+            "field": "nombre",
+            "contains": "penguin"
+        	}
+        ]
+      }  
+    ]
+	}
+}
+
+// ---------------------------------
+
+query ($filter: FilterAND){
+ filter_libro(filter: $filter)	{
+  	titulo
+  	isbn
+  	autor
+	}
+}
+
+{
+  "filter": {
+  	"and": [
+      {
+        "or": [
+          {
+            "field": "titulo",
+            "contains": "learning"
+          }
+        ]
+      }  
+    ]
+	}
+}
+
+// ----------------------------------
+
+query ($filter: FilterAND){
+ filter_libro(filter: $filter)	{
+  	titulo
+  	isbn
+  	autor
+  	idioma
+  	formato
+  	fecha_publicacion
+	}
+}
+
+{
+  "filter": {
+  	"and": [
+      {
+        "or": [
+          {
+            "field": "titulo",
+            "contains": "algorith"
+          },
+          {
+            "field": "idioma",
+            "eq": "es"
+          }
+        ]
+      }
+    ]
+	}
+}

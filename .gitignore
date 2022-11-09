@@ -1,0 +1,10 @@
+venv/
+__pycache__
+.env
+env/
+backend/alembic/
+backend/alembic.ini
+node_modules/
+.ipynb_checkpoints/
+node_modules/
+*.rdb
