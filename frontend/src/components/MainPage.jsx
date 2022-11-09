@@ -72,12 +72,12 @@ const MainPage = () => {
         let nombres = []
 
         if (tipo == "juguetes"){
-            nombre = document.getElementById("title_input").value; 
-            modo_juego = document.getElementById("author_input").value;
-            tema = document.getElementById("publisher_input").value; 
-            publico_objetivo = document.getElementById("genre_input").value; 
-            fuente_energia = document.getElementById("isbn_input").value ;
-            material_principal = document.getElementById("edition_input").value ;
+            nombre = document.getElementById("author_input").value; 
+            modo_juego = document.getElementById("isbn_input").value;
+            tema = document.getElementById("title_input").value; 
+            publico_objetivo = document.getElementById("year_input").value; 
+            fuente_energia = document.getElementById("edition_input").value ;
+            material_principal = document.getElementById("publisher_input").value ;
             queries = `
             query ($filter: FilterAND){
                 filter_juguete(filter: $filter)	{
@@ -311,10 +311,6 @@ const MainPage = () => {
     const handlequery = (e) =>{ 
         e.preventDefault();
 
-        //s_type = document.getElementById("type_select").value;
-        //i_author = document.getElementById("author_input").value;
-        //i_tittle = document.getElementById("tittle_input").value;
-
         get_elementos();
     }
 
@@ -328,7 +324,7 @@ const MainPage = () => {
 
     //For select values
     let author_place = "Author (Alt + a)"; let author_place_s = "Author (Alt + shift + a)";
-    let tittle_place = "Book tittle (Alt + t)"; let tittle_place_s = "Book tittle (Alt + shift + t)";
+    let tittle_place = "Book tittle (Alt + t)"; let tittle_place_s = "Book title (Alt + shift + t)";
     let publisher_place = "Publisher (Alt + p)"; let publisher_place_s = "Publisher (Alt + shift + p)";
     let edition_place = "Edition (Alt + k)"; let edition_place_s = "Edition (Alt + shift + k)"
     let year_place = "Year (Alt + y)"; let year_place_s = "Year (Alt + shift + y)";
@@ -336,17 +332,17 @@ const MainPage = () => {
 
     function forToysSearch(value) {
         let ts = document.getElementById("type_select").value;
-        if (ts == "Book") {
+        if (ts == "libros") {
             if (!val) {
                 document.getElementById("author_input").placeholder = author_place;
-                document.getElementById("tittle_input").placeholder = tittle_place;
+                document.getElementById("title_input").placeholder = tittle_place;
                 document.getElementById("publisher_input").placeholder = publisher_place;
                 document.getElementById("edition_input").placeholder = edition_place;
                 document.getElementById("year_input").placeholder = year_place;
                 document.getElementById("isbn_input").placeholder = isbn_place;
             } else {
                 document.getElementById("author_input").placeholder = author_place_s;
-                document.getElementById("tittle_input").placeholder = tittle_place_s;
+                document.getElementById("title_input").placeholder = tittle_place_s;
                 document.getElementById("publisher_input").placeholder = publisher_place_s;
                 document.getElementById("edition_input").placeholder = edition_place_s;
                 document.getElementById("year_input").placeholder = year_place_s;
@@ -355,7 +351,7 @@ const MainPage = () => {
         } else {
             if (!val) {
                 document.getElementById("author_input").placeholder = "Nombre (Alt + a)";
-                document.getElementById("tittle_input").placeholder = "Tema (Alt + t)";
+                document.getElementById("title_input").placeholder = "Tema (Alt + t)";
                 document.getElementById("publisher_input").placeholder = "Material (Alt + p)";
                 document.getElementById("edition_input").placeholder = "Energía (Alt + k)";
                 document.getElementById("year_input").placeholder = "Publico (Alt + y)"
@@ -389,8 +385,8 @@ const MainPage = () => {
                     <form className="all-inputs">
                         <div className="first-row">
                             <select name="t_product" id="type_select" onChange={forToysSearch}>
-                                <option value="Book" selected>Book</option>
-                                <option value="Toy">Toy</option>
+                                <option value="libros" selected>Book</option>
+                                <option value="juguetes">Toy</option>
                             </select>   
 
                             { val ? <input type="text" placeholder={author_place_s} id="author_input" accessKey="a"/>:
