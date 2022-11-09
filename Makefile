@@ -3,4 +3,4 @@ back:
 front:
 	cd ./frontend && npm start
 qs:
-	cd ./query_service & npm run dev
+	cd ./query_service && npm run dev

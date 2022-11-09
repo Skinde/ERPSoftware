@@ -176,58 +176,105 @@ const MainPage = () => {
                     }      
                 );
             }
-
+            if(year != "")
+            {    variable = {
+                    "filter": {
+                    "and": [
+                        {
+                        "or": titulos
+                        },
+                        {
+                        "or": [
+                            {"field": "editorial",
+                            "contains": editorial
+                            }
+                        ]
+                        },
+                        {
+                        "or": [
+                            {"field": "isbn",
+                            "contains": isbn
+                            }
+                        ]
+                        },
+                        {
+                            "or": [
+                            {"field": "autor",
+                                "contains": autor
+                            }
+                            ]
+                        },
+                        {
+                            "or": [
+                            {"field": "genero",
+                                "contains": genero
+                            }
+                            ]
+                        },
+                        {
+                            "or": [
+                            {"field": "edicion",
+                                "contains": edicion
+                            }
+                            ]
+                        },
+                        {
+                            "or": [
+                            {"field": "fecha_publicacion",
+                                "eq": year
+                            }
+                            ]
+                        }
+                    ]	
+                    }
+            };
+        } else{
             variable = {
                 "filter": {
-                  "and": [
+                "and": [
                     {
-                      "or": titulos
+                    "or": titulos
                     },
                     {
-                      "or": [
+                    "or": [
                         {"field": "editorial",
-                          "contains": editorial
+                        "contains": editorial
                         }
-                      ]
+                    ]
                     },
                     {
-                      "or": [
+                    "or": [
                         {"field": "isbn",
-                          "contains": isbn
+                        "contains": isbn
                         }
-                      ]
+                    ]
                     },
                     {
                         "or": [
-                          {"field": "autor",
+                        {"field": "autor",
                             "contains": autor
-                          }
+                        }
                         ]
                     },
                     {
                         "or": [
-                          {"field": "genero",
+                        {"field": "genero",
                             "contains": genero
-                          }
+                        }
                         ]
                     },
                     {
                         "or": [
-                          {"field": "edicion",
+                        {"field": "edicion",
                             "contains": edicion
-                          }
-                        ]
-                    },
-                    {
-                        "or": [
-                          {"field": "fecha_publicacion",
-                            "eq": year
-                          }
+                        }
                         ]
                     }
-                  ]	
+                ]	
                 }
-          };
+        };
+
+        }
             columns = for_libros;
             
         }
