@@ -9,6 +9,7 @@ type Libro {
     genero: String
     edicion: String
     nro_paginas: Int
+    stock: Int
 }
 
 type Juguete {
@@ -18,6 +19,7 @@ type Juguete {
     fuente_energia: String
     modo_juego: String
     publico_objetivo: String
+    stock: Int
 }
 
 type Item_Juguete {
@@ -75,10 +77,9 @@ type Query {
     test: String
     libros: [Libro]
     juguetes: [Juguete]
-    item_juguete: [Item_Juguete]
-    item_libro: [Item_Libro]
     # NEW
     filter_libro(filter: FilterAND): [Libro]
     filter_juguete(filter: FilterAND): [Juguete]
-    item_filter(filter: FilterAND): [Item]
+    item_libro(filter: FilterAND): [Libro]
+    item_juguete(filter: FilterAND): [Item]
 }

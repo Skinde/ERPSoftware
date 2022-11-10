@@ -108,28 +108,6 @@ const resolvers = {
         
         return toys["Juguetes"];
     },
-    item_libro: async ({}, context) => {     
-        const books = await instance.get("/api/inventario_libros", {
-            headers: {
-                'Authorization': context['auth']
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        
-        return books["Libros"];
-    },
-    item_juguete: async({}, context) => {
-        const toys = await instance.get("/api/inventario_juguetes", {
-            headers: {
-                'Authorization': context['auth']
-            }
-        })
-            .then(res => res.data)
-            .catch(err => console.log(err));
-        
-        return toys["Juguetes"];
-    },
     // NEW
     filter_libro: async({ filter }, context) => {
         filter = JSON.parse(JSON.stringify(filter));
@@ -145,6 +123,16 @@ const resolvers = {
         
         // EXECUTE filter parse parameters over objects
         let response = exec_filters(libros, filter_funcs);
+        
+        // GET COUNT
+        let stock_libros = await get_data("stock_libros", "/api/stock_libros", context['auth']);
+        
+        for (let obj of response)
+            obj.stock = stock_libros[obj.nombre] || 0;
+            
+        // response.forEach(element => {
+        //     element.stock = stock_libros[element.nombre];
+        // });
         
         return response;
     },
@@ -192,6 +180,45 @@ const resolvers = {
         }
 
         return Juguetes;
+    },
+    item_libro: async ({ filter }, context) => {     
+        // PARSE filter ARGUMENT
+        let res = await resolvers.filter_libro({filter}, context);
+
+        return res;
+
+
+        filter = JSON.parse(JSON.stringify(filter));
+        // console.log(`\tPARSED QUERY\n${JSON.stringify(filter)}`);
+        
+        // PARSE parameter of GraphQL query
+        let filter_funcs = parse_query_arg(filter);
+
+        const libros = await get_data("Libros", "/api/libros", context["auth"]);
+        
+        // EXECUTE filter parse parameters over objects
+        let response = exec_filters(libros, filter_funcs);
+
+        return response;
+    },
+    item_juguete: async({ filter }, context) => {
+        let res = await resolvers.filter_juguete({filter}, context);
+
+        return res;
+
+        // PARSE filter ARGUMENT
+        filter = JSON.parse(JSON.stringify(filter));
+        console.log(`\tPARSED QUERY\n${JSON.stringify(filter)}`);
+        
+        // PARSE parameter of GraphQL query
+        let filter_funcs = parse_query_arg(filter);
+
+        const juguetes = await get_data("Juguetes", "/api/inventario_juguetes", context["auth"]);
+
+        // EXECUTE filter parse parameters over objects
+        let response = exec_filters(juguetes, filter_funcs);
+        
+        return response;
     }
 }
 
