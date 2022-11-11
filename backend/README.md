@@ -40,6 +40,7 @@
 - https://stackoverflow.com/questions/54365873/sqlalchemy-update-multiple-rows-in-one-transaction
 - https://stackoverflow.com/questions/10624937/convert-datetime-object-to-a-string-of-date-only-in-python
 - https://stackoverflow.com/questions/12943819/how-to-prettyprint-a-json-file
+- https://stackoverflow.com/questions/1052148/group-by-count-function-in-sqlalchemy
 
 `book_api_consumer.py`
 - https://stackoverflow.com/questions/12943819/how-to-prettyprint-a-json-file

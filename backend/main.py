@@ -380,7 +380,7 @@ async def get_inventario_juguetes(
         return {
             "success": True,
             "#": len(db_response),
-            "Juguetes": [ins.__dict__ for ins in db_response]
+            "inventario_juguetes": [ins.__dict__ for ins in db_response]
         }
     except Exception as e:
         print(e)
@@ -419,6 +419,40 @@ async def get_stock_libros(
             "success": True,
             "#": len(libros_disponibles),
             "stock_libros": stock_libros
+        }
+    except Exception as e:
+        print(e)
+        session.rollback()
+        raise _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    finally:
+        session.close()
+
+@app.get("/api/stock_juguetes")
+async def get_stock_libros(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),   
+):
+    session = _database.Session()
+    try:
+        juguetes_disponibles = session.query(_models.Inventario_juguete.nombre, _sqlalchemy.func.count(_models.Inventario_juguete.nombre)).\
+                                group_by(_models.Inventario_juguete.nombre).filter_by(estado='disponible').all()
+
+        stock_juguetes = {}
+        for ins in juguetes_disponibles:
+            nombre, stock = tuple(ins)
+            stock_juguetes[nombre] = stock
+
+        return {
+            "success": True,
+            "#": len(juguetes_disponibles),
+            "stock_juguetes": stock_juguetes
         }
     except Exception as e:
         print(e)

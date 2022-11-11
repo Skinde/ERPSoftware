@@ -80,6 +80,6 @@ type Query {
     # NEW
     filter_libro(filter: FilterAND): [Libro]
     filter_juguete(filter: FilterAND): [Juguete]
-    item_libro(filter: FilterAND): [Libro]
-    item_juguete(filter: FilterAND): [Item]
+    item_libro(filter: FilterAND): [Item_Libro]
+    item_juguete(filter: FilterAND): [Item_Juguete]
 }
