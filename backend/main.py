@@ -513,6 +513,7 @@ async def get_inventario(
 async def sell_libro(
     current_user = _fastapi.Depends(_services.get_current_user),
     db: _orm.Session = _fastapi.Depends(_database.get_db),
+    nombre: str = "",
     qt: int = 1
 ):
     "Sell book or books and change their status"
@@ -520,13 +521,18 @@ async def sell_libro(
     session = _database.Session()
     try:
         model_instances = session.query(_models.Inventario_libro).\
-            filter_by(estado='disponible').\
+            filter_by(estado='disponible', titulo=nombre).\
                 limit(qt).all()
         
         if len(model_instances) == 0:
             return {
                 "success": False,
                 "message": "no available items"
+            }
+        elif len(model_instances) < qt:
+            return {
+                "success": False,
+                "message": "not enough items"
             }
         
         for libro in model_instances:
@@ -553,6 +559,7 @@ async def sell_libro(
 async def sell_juguete(
     current_user = _fastapi.Depends(_services.get_current_user),
     db: _orm.Session = _fastapi.Depends(_database.get_db),
+    nombre: str = "",
     qt: int = 1
 ):
     "Sell toy or toys and change their status"
@@ -560,13 +567,18 @@ async def sell_juguete(
     session = _database.Session()
     try:
         model_instances = session.query(_models.Inventario_juguete).\
-            filter_by(estado='disponible').\
+            filter_by(estado='disponible', nombre=nombre).\
                 limit(qt).all()
         
         if len(model_instances) == 0:
             return {
                 "success": False,
                 "message": "no available items"
+            }
+        elif len(model_instances) < qt:
+            return {
+                "success": False,
+                "message": "not enough items"
             }
         
         for juguete in model_instances:
