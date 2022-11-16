@@ -6,6 +6,12 @@ import sqlalchemy.orm as _orm
 import database as _database
 import uuid as _uuid
 
+
+
+from sqlalchemy_utils.types.ts_vector import TSVectorType
+
+
+
 class Elemento(_database.Base):
     __tablename__ = 'elemento'
     nombre = _sqlalchemy.Column(_sqlalchemy.String, primary_key=True)
@@ -79,7 +85,8 @@ class Libro(Elemento):
     genero = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     edicion = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     nro_paginas = _sqlalchemy.Column(_sqlalchemy.Integer, nullable=True)
-
+    
+    
     __mapper_args__ = {
         "polymorphic_identity": "libro"
     }
@@ -146,14 +153,14 @@ class Libro(Elemento):
 
 class Juguete(Elemento):
     __tablename__ = "juguete"
-    nombre = _sqlalchemy.Column(_sqlalchemy.String, _sqlalchemy.ForeignKey("elemento.nombre"), primary_key=True)
+    nombre = _sqlalchemy.Column(_sqlalchemy.Unicode(255), _sqlalchemy.ForeignKey("elemento.nombre"), primary_key=True)
 
     tema = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     material_principal = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     fuente_energia = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     modo_juego = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
     publico_objetivo = _sqlalchemy.Column(_sqlalchemy.String, nullable=True)
-
+    
     __mapper_args__ = {
         "polymorphic_identity": "juguete"
     }

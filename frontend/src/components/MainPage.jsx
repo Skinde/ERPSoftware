@@ -12,6 +12,26 @@ const l_icon = require('./../oficial_icon.png');
 
 let columns = [];
 
+
+const elim_element = async () => {
+    const requestOptions ={
+        method: "POST",                
+        headers: {
+            "accept": "application/json",
+            Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+            type: {type},
+            uuid: {uuid}
+        })           
+    };
+    const response =  (await fetch("http://localhost:8000/api/delete", requestOptions)
+        );
+    console.log(response.json());
+}
+
+
+
 const for_juguetes = [
     { name: "Nombre", selector: row => row.nombre, sortable: true, center: false, left: true, grow: 1.5 },    
     { name: "Modo de juego", selector: row => row.modo_juego, sortable: false, center: false, right: true },
@@ -19,6 +39,11 @@ const for_juguetes = [
     { name: "Público objetivo", selector: row => row.publico_objetivo, sortable: false, center: false, right: true },
     { name: "Fuente de energía", selector: row => row.fuente_energia, sortable: false, center: false, right: true },
     { name: "Material principal", selector: row => row.material_principal, sortable: false, center: false, right: true },
+    {
+        name: '¿Eliminar?',
+        button: true,
+        cell: () => <button onClick={elim_element} type="button">Download</button>,
+    },
 ];
 
 
@@ -32,6 +57,11 @@ const for_libros = [
     { name: "Género", selector: row => row.genero, sortable: false, center: false, right: true },
     { name: "Edición", selector: row => row.edicion, sortable: false, center: false, right: true },
     { name: "N° de páginas", selector: row => row.nro_paginas, sortable: false, center: false, right: true },
+    {
+        name: '¿Eliminar?',
+        button: true,
+        cell: () => <button type="button">Download</button>,
+    },
 ];  
 
 
@@ -55,6 +85,7 @@ const MainPage = () => {
     //let s_type, i_author, i_tittle;
 
     const [token, setToken] = useContext(UserContext);
+
     const [data_out, setData_out] = useState([]); 
     const { register, handleSubmit, getValues, formState: {errors} } = useForm();
     let tipo, titulo, autor, editorial, genero, isbn, edicion, year; 
@@ -62,7 +93,6 @@ const MainPage = () => {
 
     let queries,variable ;
     const navigate = useNavigate();
-
     const get_elementos = async () => {
 
         tipo = document.getElementById("type_select").value;

@@ -13,7 +13,8 @@ const Login = () => {
     const [, setToken] = useContext(UserContext);
 
     const submitLogin = async () => {
-        
+            console.log(email);
+            console.log(password);
             const requestOptions ={
                 method: "POST",
                 headers: {"Content-Type": "application/x-www-form-urlencoded",
@@ -27,7 +28,7 @@ const Login = () => {
             );
 
             if (!response.ok){
-                _cookies.remove("user_Token");
+                setToken(null);
             } else {
                 const data = await response.json(); 
                 setToken(data.access_token);

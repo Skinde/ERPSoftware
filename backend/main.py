@@ -1,4 +1,5 @@
 import datetime as _datetime
+from urllib import response
 import fastapi as _fastapi
 import fastapi.security as _security
 from fastapi.middleware.cors import CORSMiddleware as _CORSMiddleware
@@ -12,11 +13,19 @@ import database as _database
 import schemas as _schemas
 import models as _models
 import services as _services
+from fastapi import Request 
+
 
 import sqlalchemy as _sqlalchemy
 import sqlalchemy.orm as _orm
 
+from sqlalchemy_searchable import search
+from sqlalchemy_searchable import make_searchable
+
+
 _services.create_database()
+
+
 
 # GLOBAL VARIABLES
 app = _fastapi.FastAPI()
@@ -81,9 +90,8 @@ async def generate_token(
 ):
     """Login user if exists in collection and return JWT"""
     user: dict = await _services.authenticate_user(form_data.username, form_data.password, mongo_db)
-    
     if not user:
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"}
@@ -306,6 +314,8 @@ async def get_books(
             headers={"WWW-Authenticate": "Bearer"}
         )
 
+
+
 @app.get("/api/juguetes")
 async def get_toys(
     current_user = _fastapi.Depends(_services.get_current_user), 
@@ -346,6 +356,52 @@ async def get_toys(
             },
             headers={"WWW-Authenticate": "Bearer"}
         )
+
+@app.get("/api/juguetes_fts")
+async def get_toys_fts(
+    current_user = _fastapi.Depends(_services.get_current_user), 
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    term: str = "",
+    limit: int = 10, 
+    page: int = 1
+):
+    if page < 0:
+        return _fastapi.HTTPException(
+            status_code=400,    # Bad request
+            detail={
+                "success": False,
+                "error type": "pagging not valid"
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    paging: int = (page - 1) * limit
+
+    try:
+        juguetes =  db.query(_models.Juguete)
+        juguetes = search(juguetes, "Batman",  vector= _models.Juguete.TS_vector)
+        print(juguetes)
+        response = []
+        """
+        
+        for juguete in juguetes:         
+            response.append(juguete.__dict__)
+        """
+        return {
+            'status': 'success', 
+            'results': len(response),
+            'Juguetes': response
+        }
+    except Exception as e:
+        print(e)
+        return _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
 
 @app.get("/api/inventario_libros")
 async def get_inventario_libros(
@@ -530,3 +586,20 @@ async def debasement_juguete(
     qt: int = 1
 ):
     pass
+
+
+@app.post("/api/delete")
+async def delete(
+    request: Request,
+    db: _orm.Session = _fastapi.Depends(_database.get_db),
+    current_user = _fastapi.Depends(_services.get_current_user)
+    
+    
+):
+    body = await request.body()
+    body_unjasoned = _json.loads(body)
+    #Yes, this is retarded. it is also the easiest way I found of doing it
+    if (body_unjasoned["type"]["type"] == "Toy"):
+        await _services.remove_juguete(body_unjasoned["uuid"]["uuid"])
+    elif (body_unjasoned["type"]["type"] == "Book"):
+        await _services.remove_libro(body_unjasoned["uuid"]["uuid"])

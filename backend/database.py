@@ -4,13 +4,13 @@ import dotenv as _dotenv
 _dotenv.load_dotenv()
 
 import os
+from sqlalchemy_searchable import make_searchable
 
 SQLALCHEMY_DATABASE_URL = os.environ.get('PSQL_URI')
 
 engine = _sqlalchemy.create_engine(SQLALCHEMY_DATABASE_URL) # connect_args = {"check_same_thread": False}
 
 Session = _orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 Base = _orm.declarative_base(bind=engine)
 
 def get_db():
