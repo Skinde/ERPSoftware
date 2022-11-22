@@ -71,11 +71,13 @@ const exec_filters = (obj, filters) => {
     // FILTER LOGIC
     for (const or_list of filters)
     {
-        obj = obj.filter((libro) => {
+        obj = obj.filter((ins) => {
             let flag = false;
             for (const param of or_list)
-                if (param.field in libro)
-                    flag |= param.op(libro[param.field], param.s);
+                if (param.field in ins)
+                {
+                    flag |= param.op(ins[param.field], param.s);
+                }
             return flag;
         });
     }
@@ -111,7 +113,7 @@ const resolvers = {
     // NEW
     filter_libro: async({ filter }, context) => {
         filter = JSON.parse(JSON.stringify(filter));
-        console.log(`\tPARSED QUERY\n${JSON.stringify(filter)}`);
+        // console.log(`\tPARSED QUERY\n${JSON.stringify(filter)}`);
 
         // PARSE parameter of GraphQL query
         let filter_funcs = parse_query_arg(filter);
@@ -133,11 +135,10 @@ const resolvers = {
     },
     filter_juguete: async({ filter }, context) => {
         filter = JSON.parse(JSON.stringify(filter));
-        console.log(`\tPARSED QUERY\n${JSON.stringify(filter)}`);
+        // console.log(`\tPARSED QUERY\n${JSON.stringify(filter)}`);
 
         // PARSE parameter of GraphQL query
         let filter_funcs = parse_query_arg(filter);
-        
         console.log(`\tFILTER ARRAY`);
         console.dir(filter_funcs);
 
@@ -162,12 +163,17 @@ const resolvers = {
         // QUERY names on inventory data of PSQL/REDIS
         let items = await get_data("inventario_libros", "/api/inventario_libros", context['auth']);
         let titulos = []
+        
         for (const element of response)
             titulos.push(element.titulo)
+        if (titulos.length > 0)
+            items = items.filter(element => {
+                return titulos.includes(element.titulo)
+            })
+        
+        let filter_funcs = parse_query_arg(filter);
+        items = exec_filters(items, filter_funcs);
 
-        items = items.filter(element => {
-            return titulos.includes(element.titulo)
-        })
         return items;
     },
     item_juguete: async({ filter }, context) => {
@@ -176,14 +182,18 @@ const resolvers = {
         
         // QUERY names on inventory data of PSQL/REDIS
         let items = await get_data("inventario_juguetes", "/api/inventario_juguetes", context['auth']);
-        console.log(items)
         let nombres = []
+
         for (const element of response)
             nombres.push(element.nombre)
+        if (nombres.length > 0)
+            items = items.filter(element => {
+                return nombres.includes(element.nombre)
+            })
         
-        items = items.filter(element => {
-            return nombres.includes(element.nombre)
-        })
+        let filter_funcs = parse_query_arg(filter);
+        items = exec_filters(items, filter_funcs);
+        
         return items;
     }
 }
