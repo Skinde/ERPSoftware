@@ -12,26 +12,6 @@ const l_icon = require('./../oficial_icon.png');
 
 let columns = [];
 
-
-const elim_element = async () => {
-    const requestOptions ={
-        method: "POST",                
-        headers: {
-            "accept": "application/json",
-            Authorization: "Bearer " + token,
-        },
-        body: JSON.stringify({
-            type: {type},
-            uuid: {uuid}
-        })           
-    };
-    const response =  (await fetch("http://localhost:8000/api/delete", requestOptions)
-        );
-    console.log(response.json());
-}
-
-
-
 const for_juguetes = [
     { name: "Nombre", selector: row => row.nombre, sortable: true, center: false, left: true, grow: 1.5 },    
     { name: "Modo de juego", selector: row => row.modo_juego, sortable: false, center: false, right: true },
@@ -39,11 +19,7 @@ const for_juguetes = [
     { name: "Público objetivo", selector: row => row.publico_objetivo, sortable: false, center: false, right: true },
     { name: "Fuente de energía", selector: row => row.fuente_energia, sortable: false, center: false, right: true },
     { name: "Material principal", selector: row => row.material_principal, sortable: false, center: false, right: true },
-    {
-        name: '¿Eliminar?',
-        button: true,
-        cell: () => <button onClick={elim_element} type="button">Download</button>,
-    },
+    { name: "Stock", selector: row => row.stock, sortable: false, center: false, right: true },
 ];
 
 
@@ -57,11 +33,8 @@ const for_libros = [
     { name: "Género", selector: row => row.genero, sortable: false, center: false, right: true },
     { name: "Edición", selector: row => row.edicion, sortable: false, center: false, right: true },
     { name: "N° de páginas", selector: row => row.nro_paginas, sortable: false, center: false, right: true },
-    {
-        name: '¿Eliminar?',
-        button: true,
-        cell: () => <button type="button">Download</button>,
-    },
+    { name: "Stock", selector: row => row.stock, sortable: false, center: false, right: true },
+
 ];  
 
 
@@ -85,6 +58,7 @@ const MainPage = () => {
     //let s_type, i_author, i_tittle;
 
     const [token, setToken] = useContext(UserContext);
+    const handleDeleteredirect = (e) => { navigate("/Delete")}
 
     const [data_out, setData_out] = useState([]); 
     const { register, handleSubmit, getValues, formState: {errors} } = useForm();
@@ -96,7 +70,6 @@ const MainPage = () => {
     const get_elementos = async () => {
 
         tipo = document.getElementById("type_select").value;
-        
         
         let titulos = [];
         let nombres = []
@@ -117,6 +90,7 @@ const MainPage = () => {
                      tema
                      fuente_energia
                      material_principal
+                     stock
                    }
                }
 
@@ -194,7 +168,8 @@ const MainPage = () => {
                         genero
                         edicion
                         nro_paginas    
-                        titulo                
+                        titulo
+                        stock                
                     },                    
                 }                
             `            
@@ -398,17 +373,24 @@ const MainPage = () => {
     }
 
     return (
+        <section>
+            <div className="sidebar">
+                <button class="logout-button" onClick={handleClickLogOut}>
+                    <span class="glyphicon glyphicon-log-out"></span> Log Out
+                </button>
+
+                <button class="delete-button" onClick={handleDeleteredirect}>
+                    <span class="glyphicon glyphicon-trash"></span> Delete
+                </button>
+            </div>
+
+        
         <section className="all-main-wrapper">
             <div className="main-container-box">
                 <div className="top-left">                    
                     <div className="side-image">
                         <img src={l_icon} className="side-icon" alt="icon"/>
                     </div>
-
-                    <button class="logout-button" onClick={handleClickLogOut}>
-                        <span class="glyphicon glyphicon-log-out"></span> Log Out
-                    </button>
-
                 </div>
 
                 <div className="top-right">
@@ -465,6 +447,7 @@ const MainPage = () => {
                     </div>
                 </div>
             </div>
+        </section>
         </section>
     )
 }
