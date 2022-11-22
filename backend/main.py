@@ -2,7 +2,6 @@ import datetime as _datetime
 import fastapi as _fastapi
 import fastapi.security as _security
 from fastapi.middleware.cors import CORSMiddleware as _CORSMiddleware
-from fastapi import Request 
 
 import json as _json
 import passlib.hash as _hash
@@ -58,11 +57,11 @@ async def create_user(
     """Check if email already registered and register new user"""
     try:
         if not _services.validate_email(user.email):
-            return _fastapi.HTTPException(status_code=406, detail="invalid email")
+            raise _fastapi.HTTPException(status_code=406, detail="invalid email")
     
         old_user: dict = mongo_db["users"].find_one({"email": user.email})
         if old_user:
-            return _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
+            raise _fastapi.HTTPException(status_code=400, detail="e-mail already in use")
         
         user.password: str = _hash.bcrypt.hash(user.password)
         response: _pymongo.results.InsertOneResult = mongo_db["users"].insert_one(user.dict())
@@ -82,9 +81,9 @@ async def generate_token(
 ):
     """Login user if exists in collection and return JWT"""
     user: dict = await _services.authenticate_user(form_data.username, form_data.password, mongo_db)
-    
+
     if not user:
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"}
@@ -135,7 +134,7 @@ async def add_books(
 ):
     """Insert a book (item and data) in the database and return its identifier(PK)"""
     if qt < 1:
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=400, 
             detail="Invalid quantity",
             headers={"WWW-Authenticate": "Bearer"}
@@ -171,7 +170,7 @@ async def add_books(
             libro_response = _services.insert_on_db(libro)
 
             if not libro_response["success"]:
-                return _fastapi.HTTPException(
+                raise _fastapi.HTTPException(
                     status_code=500,
                     detail=libro_response,
                     headers={"WWW-Authenticate": "Bearer"}
@@ -198,7 +197,7 @@ async def add_books(
         }
     except Exception as e:
         print(e)
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=500,
             detail={
                 "success": False,
@@ -217,7 +216,7 @@ async def add_toys(
 ):
     """Insert a toy(item and data) in the database and return its identifier(uuid)"""
     if qt < 1:
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=400, 
             detail="Invalid quantity",
             headers={"WWW-Authenticate": "Bearer"}
@@ -233,7 +232,7 @@ async def add_toys(
             juguete_response = _services.insert_on_db(juguete)
 
             if not juguete_response["success"]:
-                return _fastapi.HTTPException(
+                raise _fastapi.HTTPException(
                     status_code=500,
                     detail=juguete_response,
                     headers={"WWW-Authenticate": "Bearer"}
@@ -262,7 +261,7 @@ async def add_toys(
         }
     except Exception as e:
         print(e)
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=500,
             detail={
                 "success": False,
@@ -298,7 +297,7 @@ async def get_books(
         }
     except Exception as e:
         print(e)
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=500,
             detail={
                 "success": False,
@@ -315,7 +314,7 @@ async def get_toys(
     page: int = 1
 ):
     if page < 0:
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=400,    # Bad request
             detail={
                 "success": False,
@@ -339,7 +338,7 @@ async def get_toys(
         }
     except Exception as e:
         print(e)
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=500,
             detail={
                 "success": False,
@@ -358,11 +357,11 @@ async def get_inventario_libros(
         return {
             "success": True,
             "#": len(db_response),
-            "Libros": [ins.__dict__ for ins in db_response]
+            "inventario_libros": [ins.__dict__ for ins in db_response if ins.estado=='disponible']
         }
     except Exception as e:
         print(e)
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=500,
             detail={
                 "success": False,
@@ -381,11 +380,11 @@ async def get_inventario_juguetes(
         return {
             "success": True,
             "#": len(db_response),
-            "Juguetes": [ins.__dict__ for ins in db_response]
+            "inventario_juguetes": [ins.__dict__ for ins in db_response]
         }
     except Exception as e:
         print(e)
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=500,
             detail={
                 "success": False,
@@ -393,6 +392,81 @@ async def get_inventario_juguetes(
             },
             headers={"WWW-Authenticate": "Bearer"}
         )
+
+@app.get("/api/stock_libros")
+async def get_stock_libros(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),   
+):
+    session = _database.Session()
+    try:
+        libros_disponibles = session.query(_models.Inventario_libro.titulo, _sqlalchemy.func.count(_models.Inventario_libro.titulo)).\
+                                group_by(_models.Inventario_libro.titulo).filter_by(estado='disponible').all()
+        # stock_libros = []
+        # for ins in libros_disponibles:
+        #     titulo, stock = tuple(ins)
+        #     stock_libros.append({
+        #         "titulo": titulo,
+        #         "stock": stock
+        #     })
+        
+        stock_libros = {}
+        for ins in libros_disponibles:
+            titulo, stock = tuple(ins)
+            stock_libros[titulo] = stock
+
+        return {
+            "success": True,
+            "#": len(libros_disponibles),
+            "stock_libros": stock_libros
+        }
+    except Exception as e:
+        print(e)
+        session.rollback()
+        raise _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    finally:
+        session.close()
+
+@app.get("/api/stock_juguetes")
+async def get_stock_libros(
+    current_user = _fastapi.Depends(_services.get_current_user),
+    db: _orm.Session = _fastapi.Depends(_database.get_db),   
+):
+    session = _database.Session()
+    try:
+        juguetes_disponibles = session.query(_models.Inventario_juguete.nombre, _sqlalchemy.func.count(_models.Inventario_juguete.nombre)).\
+                                group_by(_models.Inventario_juguete.nombre).filter_by(estado='disponible').all()
+
+        stock_juguetes = {}
+        for ins in juguetes_disponibles:
+            nombre, stock = tuple(ins)
+            stock_juguetes[nombre] = stock
+
+        return {
+            "success": True,
+            "#": len(juguetes_disponibles),
+            "stock_juguetes": stock_juguetes
+        }
+    except Exception as e:
+        print(e)
+        session.rollback()
+        raise _fastapi.HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error type": str(type(e))
+            },
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    finally:
+        session.close()
 
 @app.get("/api/inventario")
 async def get_inventario(
@@ -425,7 +499,7 @@ async def get_inventario(
         }
     except Exception as e:
         print(e)
-        return _fastapi.HTTPException(
+        raise _fastapi.HTTPException(
             status_code=500,
             detail={
                 "success": False,
@@ -439,6 +513,7 @@ async def get_inventario(
 async def sell_libro(
     current_user = _fastapi.Depends(_services.get_current_user),
     db: _orm.Session = _fastapi.Depends(_database.get_db),
+    nombre: str = "",
     qt: int = 1
 ):
     "Sell book or books and change their status"
@@ -446,13 +521,18 @@ async def sell_libro(
     session = _database.Session()
     try:
         model_instances = session.query(_models.Inventario_libro).\
-            filter_by(estado='disponible').\
+            filter_by(estado='disponible', titulo=nombre).\
                 limit(qt).all()
         
         if len(model_instances) == 0:
             return {
                 "success": False,
                 "message": "no available items"
+            }
+        elif len(model_instances) < qt:
+            return {
+                "success": False,
+                "message": "not enough items"
             }
         
         for libro in model_instances:
@@ -479,6 +559,7 @@ async def sell_libro(
 async def sell_juguete(
     current_user = _fastapi.Depends(_services.get_current_user),
     db: _orm.Session = _fastapi.Depends(_database.get_db),
+    nombre: str = "",
     qt: int = 1
 ):
     "Sell toy or toys and change their status"
@@ -486,13 +567,18 @@ async def sell_juguete(
     session = _database.Session()
     try:
         model_instances = session.query(_models.Inventario_juguete).\
-            filter_by(estado='disponible').\
+            filter_by(estado='disponible', nombre=nombre).\
                 limit(qt).all()
         
         if len(model_instances) == 0:
             return {
                 "success": False,
                 "message": "no available items"
+            }
+        elif len(model_instances) < qt:
+            return {
+                "success": False,
+                "message": "not enough items"
             }
         
         for juguete in model_instances:
@@ -531,22 +617,3 @@ async def debasement_juguete(
     qt: int = 1
 ):
     pass
-
-@app.post("/api/delete")
-async def delete(
-    request: Request,
-    db: _orm.Session = _fastapi.Depends(_database.get_db),
-    current_user = _fastapi.Depends(_services.get_current_user)
-    
-    
-):
-    body = await request.body()
-    body_unjasoned = _json.loads(body)
-    #Yes, this is retarded. it is also the easiest way I found of doing it
-    if (body_unjasoned["type"]["type"] == "Toy"):
-        await _services.remove_juguete(body_unjasoned["uuid"]["uuid"])
-    elif (body_unjasoned["type"]["type"] == "Book"):
-        await _services.remove_libro(body_unjasoned["uuid"]["uuid"])
-    
-    
-    

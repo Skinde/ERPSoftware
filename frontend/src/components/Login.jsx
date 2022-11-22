@@ -9,9 +9,7 @@ const inv_image = require('./../logistics.png');
 
 const Login = () => {
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    /*const [formErrors, setFormErrors] = useState({});
-    const [isSubmit, setIsSubmit] = useState(false);*/
+    const [password, setPassword] = useState("");    
     const [, setToken] = useContext(UserContext);
 
     const submitLogin = async () => {

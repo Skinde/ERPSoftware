@@ -6,7 +6,6 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { useForm } from "react-hook-form";
 
-const l_icon_style = {marginTop: '6px'}
 const l_icon = require('./../oficial_icon.png');
 
 
@@ -26,8 +25,7 @@ const for_juguetes = [
 const for_libros = [
     { name: "Titulo", selector: row => row.titulo, sortable: true, center: false, left: true, grow: 1.5 },    
     { name: "ISBN", selector: row => row.isbn, sortable: false, center: false, right: true },
-    { name: "Autor", selector: row => row.autor, sortable: false, center: false, right: true },
-    { name: "Idioma", selector: row => row.idioma, sortable: false, center: false, right: true },
+    { name: "Autor", selector: row => row.autor, sortable: false, center: false, right: true },    
     { name: "Editorial", selector: row => row.editorial, sortable: false, center: false, right: true },
     { name: "Formato", selector: row => row.formato, sortable: false, center: false, right: true },
     { name: "Fecha de publicación", selector: row => row.fecha_publicacion, sortable: false, center: false, right: true },
@@ -49,6 +47,9 @@ const customStyles = {
     },
 }
 const paginationOptions = { rowsPerPageText: '' }
+
+var isFirefox = typeof InstallTrigger !== 'undefined';
+
 const MainPage = () => {
 
     //let s_type, i_author, i_tittle;
@@ -56,13 +57,11 @@ const MainPage = () => {
     const [token, setToken] = useContext(UserContext);
     const [data_out, setData_out] = useState([]); 
     const { register, handleSubmit, getValues, formState: {errors} } = useForm();
-    let tipo, titulo, autor, editorial, genero, isbn, edicion; 
+    let tipo, titulo, autor, editorial, genero, isbn, edicion, year; 
     let nombre, modo_juego, tema, publico_objetivo, fuente_energia, material_principal; 
 
     let queries,variable ;
     const navigate = useNavigate();
-
-
 
     const get_elementos = async () => {
 
@@ -73,12 +72,12 @@ const MainPage = () => {
         let nombres = []
 
         if (tipo == "juguetes"){
-            nombre = document.getElementById("title_input").value; 
-            modo_juego = document.getElementById("author_input").value;
-            tema = document.getElementById("publisher_input").value; 
-            publico_objetivo = document.getElementById("genre_input").value; 
-            fuente_energia = document.getElementById("isbn_input").value ;
-            material_principal = document.getElementById("edition_input").value ;
+            nombre = document.getElementById("author_input").value; 
+            modo_juego = document.getElementById("isbn_input").value;
+            tema = document.getElementById("title_input").value; 
+            publico_objetivo = document.getElementById("year_input").value; 
+            fuente_energia = document.getElementById("edition_input").value ;
+            material_principal = document.getElementById("publisher_input").value ;
             queries = `
             query ($filter: FilterAND){
                 filter_juguete(filter: $filter)	{
@@ -90,12 +89,9 @@ const MainPage = () => {
                      material_principal
                    }
                }
-               
-               
-               
-               
+
             `
-            for(var nom of nombre.split(" ")){
+            for(var nom of nombre.split(", ")){
                 nombres.push(
                     {"field": "nombre",
                     "contains": nom
@@ -140,6 +136,7 @@ const MainPage = () => {
                     }
                     ]
                 }
+                
                 ]
                 }
             }
@@ -153,6 +150,8 @@ const MainPage = () => {
             genero = document.getElementById("genre_input").value; 
             isbn = document.getElementById("isbn_input").value ;
             edicion = document.getElementById("edition_input").value ;
+            year = document.getElementById("year_input").value;
+            
             queries = `
                 query($filter: FilterAND) {
                     filter_libro(filter : $filter){                                        
@@ -170,42 +169,112 @@ const MainPage = () => {
                 }                
             `            
             
-            for(var tit of titulo.split(" ")){
+            for(var tit of titulo.split(", ")){
                 titulos.push(
                     {"field": "titulo",
                     "contains": tit
-                    }      );
+                    }      
+                );
             }
+            if(year != "")
+            {    variable = {
+                    "filter": {
+                    "and": [
+                        {
+                        "or": titulos
+                        },
+                        {
+                        "or": [
+                            {"field": "editorial",
+                            "contains": editorial
+                            }
+                        ]
+                        },
+                        {
+                        "or": [
+                            {"field": "isbn",
+                            "contains": isbn
+                            }
+                        ]
+                        },
+                        {
+                            "or": [
+                            {"field": "autor",
+                                "contains": autor
+                            }
+                            ]
+                        },
+                        {
+                            "or": [
+                            {"field": "genero",
+                                "contains": genero
+                            }
+                            ]
+                        },
+                        {
+                            "or": [
+                            {"field": "edicion",
+                                "contains": edicion
+                            }
+                            ]
+                        },
+                        {
+                            "or": [
+                            {"field": "fecha_publicacion",
+                                "eq": year
+                            }
+                            ]
+                        }
+                    ]	
+                    }
+            };
+        } else{
             variable = {
                 "filter": {
-                  "and": [
+                "and": [
                     {
-                      "or": titulos
+                    "or": titulos
                     },
                     {
-                      "or": [
+                    "or": [
                         {"field": "editorial",
-                          "contains": editorial
+                        "contains": editorial
                         }
-                      ]
+                    ]
                     },
                     {
-                      "or": [
+                    "or": [
                         {"field": "isbn",
-                          "contains": isbn
+                        "contains": isbn
                         }
-                      ]
+                    ]
                     },
                     {
                         "or": [
-                          {"field": "autor",
+                        {"field": "autor",
                             "contains": autor
-                          }
+                        }
                         ]
-                      }
-                  ]	
+                    },
+                    {
+                        "or": [
+                        {"field": "genero",
+                            "contains": genero
+                        }
+                        ]
+                    },
+                    {
+                        "or": [
+                        {"field": "edicion",
+                            "contains": edicion
+                        }
+                        ]
+                    }
+                ]	
                 }
-          };
+        };
+
+        }
             columns = for_libros;
             
         }
@@ -225,26 +294,26 @@ const MainPage = () => {
             }
         )
         .then(res => res.data)
-        .catch(err => console.log(err));     
+        .catch(err => console.log(err));  
+        if (response)
+        {   
         console.log(response.data);
+        console.log(response);
 
-        if (tipo === "juguetes"){
-            
-            setData_out(response.data.filter_juguete);            
-        } else {                        
-            setData_out(response.data.filter_libro);            
+        
+            if (tipo === "juguetes"){
+                setData_out(response.data.filter_juguete);            
+            } else {                        
+                setData_out(response.data.filter_libro);            
+            } 
         }
+      
         
 
     }
     
-    
     const handlequery = (e) =>{ 
         e.preventDefault();
-
-        //s_type = document.getElementById("type_select").value;
-        //i_author = document.getElementById("author_input").value;
-        //i_tittle = document.getElementById("tittle_input").value;
 
         get_elementos();
     }
@@ -252,62 +321,112 @@ const MainPage = () => {
     const handleClickLogOut = (e) => { 
         setToken(null)              
         navigate("/"); 
-    }   
-
-    const handleDelete = (e) => {
-        navigate("/delete");
     }
+
+    //For browser
+    const [val] = React.useState(isFirefox);
+
+    //For select values
+    let author_place = "Author (Alt + a)"; let author_place_s = "Author (Alt + shift + a)";
+    let tittle_place = "Book tittle (Alt + t)"; let tittle_place_s = "Book title (Alt + shift + t)";
+    let publisher_place = "Publisher (Alt + p)"; let publisher_place_s = "Publisher (Alt + shift + p)";
+    let edition_place = "Edition (Alt + k)"; let edition_place_s = "Edition (Alt + shift + k)"
+    let year_place = "Year (Alt + y)"; let year_place_s = "Year (Alt + shift + y)";
+    let isbn_place = "ISBN (Alt + i)"; let isbn_place_s = "ISBN (Alt + shift + i";
+
+    function forToysSearch(value) {
+        let ts = document.getElementById("type_select").value;
+        if (ts == "libros") {
+            if (!val) {
+                document.getElementById("author_input").placeholder = author_place;
+                document.getElementById("title_input").placeholder = tittle_place;
+                document.getElementById("publisher_input").placeholder = publisher_place;
+                document.getElementById("edition_input").placeholder = edition_place;
+                document.getElementById("year_input").placeholder = year_place;
+                document.getElementById("isbn_input").placeholder = isbn_place;
+            } else {
+                document.getElementById("author_input").placeholder = author_place_s;
+                document.getElementById("title_input").placeholder = tittle_place_s;
+                document.getElementById("publisher_input").placeholder = publisher_place_s;
+                document.getElementById("edition_input").placeholder = edition_place_s;
+                document.getElementById("year_input").placeholder = year_place_s;
+                document.getElementById("isbn_input").placeholder = isbn_place_s;
+            }
+        } else {
+            if (!val) {
+                document.getElementById("author_input").placeholder = "Nombre (Alt + a)";
+                document.getElementById("title_input").placeholder = "Tema (Alt + t)";
+                document.getElementById("publisher_input").placeholder = "Material (Alt + p)";
+                document.getElementById("edition_input").placeholder = "Energía (Alt + k)";
+                document.getElementById("year_input").placeholder = "Publico (Alt + y)"
+                document.getElementById("isbn_input").placeholder = "Modo (Alt + i)";
+            } else {
+                document.getElementById("author_input").placeholder = "Nombre (Alt + shift + a)";
+                document.getElementById("title_input").placeholder = "Tema (Alt + shift + t)";
+                document.getElementById("publisher_input").placeholder = "Material (Alt + shift + p)";
+                document.getElementById("edition_input").placeholder = "Energia (Alt + shift + k)";
+                document.getElementById("year_input").placeholder = "Publico (Alt + shift + y)"
+                document.getElementById("isbn_input").placeholder = "Modo (Alt + shift + i)";
+            }
+        }
+    }
+
     return (
-        <div class="wrapper" >     
-            <div class="image_wrapper">
-                <div class="side_image">
-                    <div style={l_icon_style}>
-                        <img src={l_icon} width="125px" alt="Side Icon"/>
+        <section className="all-main-wrapper">
+            <div className="main-container-box">
+                <div className="top-left">                    
+                    <div className="side-image">
+                        <img src={l_icon} className="side-icon" alt="icon"/>
                     </div>
-                </div>
-                <button class="delete-button" onClick={handleDelete}>
-			        Delete
-	    	    </button>
-                <button class="logout-button" onClick={handleClickLogOut}>
-                    <span class="glyphicon glyphicon-log-out"></span> Log Out
-                </button>
-            </div>
 
-            <form class="all-inputs">
-                <div class = "first-row">
-                    <select name="t_product" id="type_select">
-                        <option value="" selected disabled>Type</option>
-                        <option value="libros">Book</option>
-                        <option value="juguetes">Toy</option>
-                    </select>
-                    
-                    <input class="input_1" type="text" placeholder="Author" id="author_input"/>
-                    <input class="input_1" type="text" placeholder="Book Title" id="title_input"/>
+                    <button class="logout-button" onClick={handleClickLogOut}>
+                        <span class="glyphicon glyphicon-log-out"></span> Log Out
+                    </button>
+
                 </div>
 
-                <div class = "second-row">
-                    <input type="text" placeholder="Publisher" id="publisher_input"/>
-                    <input type="text" placeholder="Edition" id="edition_input"/>
+                <div className="top-right">
+                    <form className="all-inputs">
+                        <div className="first-row">
+                            <select name="t_product" id="type_select" onChange={forToysSearch}>
+                                <option value="libros" selected>Book</option>
+                                <option value="juguetes">Toy</option>
+                            </select>   
 
-                    <select name="t_product" id="genre_input" >
-                        <option value="" selected disabled>Genre</option>
-                        <option value="accion">Action</option>
-                        <option value="aventura">Adventure</option>
-                        <option value="educacion">Education</option>
-                    </select>
+                            { val ? <input type="text" placeholder={author_place_s} id="author_input" accessKey="a"/>:
+                                <input type="text" placeholder={author_place} id="author_input" accessKey="a"/> }
+                            { val ? <input type="text" placeholder="Book tittle (Alt + shift + t)" id="title_input" accessKey="t"/>:
+                                <input type="text" placeholder="Book tittle (Alt + t)" id="title_input" accessKey="t"/> }
+                            
+                        </div>
+
+                        <div className="second-row">
+                            <select name="t_genre" id="genre_input">
+                                <option value="" selected disabled>Genre</option>
+                                <option value="Action" id="genre_select_v1">Action</option>
+                                <option value="Adventure">Adventure</option>
+                                <option value="Education">Education</option>
+                            </select>
+
+                            { val ? <input type="text" placeholder="Publisher (Alt + shift + p)" id="publisher_input" accessKey="p"/>:
+                                <input type="text" placeholder="Publisher (Alt + p)" id="publisher_input" accessKey="p"/> }
+                            { val ?  <input type="text" placeholder="Edition (Alt + shift + k)" id="edition_input" accessKey="k"/>:
+                                <input type="text" placeholder="Edition (Alt + k)" id="edition_input" accessKey="k"/> }
+                        </div>
+
+                        <div className="third-row">
+                            { val ? <input type="number" placeholder="Year (Alt + shift + y)" id="year_input" accessKey="y"/>:
+                                <input type="number" placeholder="Year (Alt + y)" id="year_input" accessKey="y"/> }
+                            { val ? <input type="text" placeholder="ISBN (Alt + shift + i)" id="isbn_input" accessKey="i"/>:
+                                <input type="text" placeholder="ISBN (Alt + i)" id="isbn_input" accessKey="i"/>}
+                            
+                        </div>
+                        <input type="submit" value="Search" onClick={handlequery}/>
+                    </form>
                 </div>
 
-                <div class="third-row">
-                    <input type="text" placeholder="Year" id="year_input"/>
-                    <input type="text" placeholder="ISBN" id="isbn_input"/>
-                </div>
-
-                <input type="submit" value="Search" onClick={handlequery}/>
-            </form>
-
-            <div class="Results-Wrapper">
-            
-                <div class="For-table">
+                <div className="results-wrapper">
+                    <div class="table-content">
                         <DataTable
                             columns={columns}
                             data={data_out}
@@ -317,9 +436,10 @@ const MainPage = () => {
                             paginationRowsPerPageOptions={[]}
                             fixedHeader
                         />
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
     )
 }
 

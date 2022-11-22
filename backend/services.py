@@ -10,7 +10,7 @@ import pymongo as _pymongo
 import re as _re
 import sqlalchemy.inspection as _sqlinspect
 import sqlalchemy.orm as _orm
-from sqlalchemy import update
+
 import mongo as _mongo
 import database as _database
 import models as _models
@@ -122,19 +122,6 @@ async def authenticate_user(
         return False
 
     return user
-
-async def remove_libro(uuid_input: str):
-    conn = _database.engine.connect()
-    stmt = update(_models.Inventario_libro).where(_models.Inventario_libro.uuid == uuid_input).values(estado = "eliminado")
-    conn.execute(stmt)
-    return
-async def remove_juguete(uuid_input: str):
-    conn = _database.engine.connect()
-    stmt = update(_models.Inventario_juguete).where(_models.Inventario_juguete.uuid == uuid_input).values(estado = "eliminado")
-    conn.execute(stmt)
-    return
-    
-
 
 async def create_token(user: dict):
     """Create a JWT based on user email and return it"""
