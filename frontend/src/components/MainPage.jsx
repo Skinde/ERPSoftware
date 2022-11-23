@@ -380,7 +380,7 @@ const MainPage = () => {
                 </button>
 
                 <button class="delete-button" onClick={handleDeleteredirect}>
-                    <span class="glyphicon glyphicon-trash"></span> Delete
+                    <span class="glyphicon glyphicon-trash"></span> Inventario
                 </button>
             </div>
 

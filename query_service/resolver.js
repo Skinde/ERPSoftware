@@ -29,7 +29,7 @@ const get_data = async (key, endpoint, jwt) => {
             
             let response = response_data[key];
             // SAVE DATA ON REDIS
-            await redis.set(key, JSON.stringify(response), 'EX', 300);
+            await redis.set(key, JSON.stringify(response), 'EX', 10);
             return response;
         }
     } catch (error) {
