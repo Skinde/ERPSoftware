@@ -11,10 +11,9 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");    
     const [, setToken] = useContext(UserContext);
-
+    var okpass = false;
     const submitLogin = async () => {
-            console.log(email);
-            console.log(password);
+        
             const requestOptions ={
                 method: "POST",
                 headers: {"Content-Type": "application/x-www-form-urlencoded",
@@ -28,11 +27,15 @@ const Login = () => {
             );
 
             if (!response.ok){
-                setToken(null);
+                _cookies.remove("user_Token");
+
             } else {
                 const data = await response.json(); 
                 setToken(data.access_token);
+                navigate("/Home");
+                
             }
+            
         };
 
 
@@ -41,9 +44,7 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         submitLogin();
-        if (_cookies.get("user_Token") != null) {
-            navigate("/Home");
-        }
+
     };    
 
     return (

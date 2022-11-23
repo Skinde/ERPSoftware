@@ -246,12 +246,15 @@ const Delete = () => {
 
         get_elementos();
     }
-
+    const handleClickLogOut = (e) => { 
+        setToken(null)              
+        navigate("/"); 
+    }
 
     return (
         <section>
             <div className="sidebar">
-                <button class="logout-button">
+                <button class="logout-button" onClick={handleClickLogOut}>
                     <span class="glyphicon glyphicon-log-out"></span> Log Out
                 </button>
 
@@ -279,7 +282,7 @@ const Delete = () => {
 
                                  <input type="text" placeholder="UUID" id="author_input" accessKey="a"/>
                                     
-                                 <input type="text" placeholder="Book title" id="title_input" accessKey="t"/>
+                                 <input type="text" placeholder="Product name" id="title_input" accessKey="t"/>
                                 
                                 
                             </div>
