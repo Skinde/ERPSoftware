@@ -58,17 +58,6 @@
     background-color: #d23f2f;
 }
 
-.back-button {
-    width: 10%;
-    height: 30px;
-    margin-left: 78.5%;
-
-    border-radius: 5px;
-    border-width: 1px;
-    color: white;
-    background-color: #03256C;
-}
-
 .top-right {
     width: 90%;
     float: right;
@@ -192,18 +181,6 @@ input[type="number"] {
     background-color: #d9d9d9;
 }
 
-
-.results-wrapper-delete {
-    float: right;
-    width: 110%;
-    height: 5%;
-
-    margin-top: 20px;
-    border-radius: 10px;
-    padding: 20px;
-    background-color: #d9d9d9;
-}
-
 .table-content {
     border-radius: 10px;
 }
@@ -218,47 +195,35 @@ input[type="number"] {
     background-color: #ffff;
 }
 
-/*
-.vertical-nav {
-    min-width: 17rem;
-    width: 17rem;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.4s;
+/* For Delete From */
+
+.back-button {
+    width: 10%;
+    height: 30px;
+    margin-left: 78.5%;
+
+    border-radius: 5px;
+    border-width: 1px;
+    color: white;
+    background-color: #03256C;
 }
-  
-  .page-content {
-    width: calc(100% - 17rem);
-    margin-left: 17rem;
-    transition: all 0.4s;
-  }
-  
-  #sidebar.active {
-    margin-left: -17rem;
-  }
-  
-  #content.active {
-    width: 100%;
-    margin: 0;
-  }
-  
-  @media (max-width: 768px) {
-    #sidebar {
-      margin-left: -17rem;
-    }
-    #sidebar.active {
-      margin-left: 0;
-    }
-    #content {
-      width: 100%;
-      margin: 0;
-    }
-    #content.active {
-      margin-left: 17rem;
-      width: calc(100% - 17rem);
-    }
-  }
-*/
+
+.results-wrapper-delete {
+    float: right;
+    width: 111%;
+    height: 5%;
+
+    margin-top: 20px;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #d9d9d9;
+}
+
+.to_download {
+    background-color: white;
+    margin-top: 20px;
+    padding: 7.5px;
+
+    border-radius: 10px;
+    float: right;
+}

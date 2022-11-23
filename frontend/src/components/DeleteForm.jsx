@@ -5,6 +5,7 @@ import axios from "axios";
 import './../styles/Main_page.css';
 import { useNavigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
+import { CSVLink } from "react-csv";
 
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -33,16 +34,6 @@ function extractValues() {
     */
 }
 
-const randomTable = [
-    {Tittle:"Introduction to Algorithms", Author:"Thomas H., Cormen", Edition:"4th", 
-        Publisher:"The MIT press", Genre: "Education", Year: "2021", ISBN: "978-0262046305"},
-    {Tittle:"Computability, Complexity, and Languages: Fundamentals of Theoretical Computer Science", Author:"Martin D., Davis", Edition:"2nd",
-        Publisher:"Morgan Kaufmann", Genre: "Education", Year: "1994", ISBN: "978-0122063824"},
-    {Tittle:"The Universal Computer: The Road from Leibniz to Turing", Author:"Davis, Martin", Edition:"1st",
-        Publisher:"W. W. Norton & Company", Genre: "Education", Year: "2000", ISBN: "978-0393047851"},
-    {Tittle:"Operating systems: Design and implementation", Author:"Tanenbaum A., Woodhull, A.", Edition:"3rd",
-        Publisher:"Pearson", Genre: "Education", Year: "2006", ISBN: "978-0131429383"},
-];
 
 
 
@@ -69,7 +60,9 @@ const Delete = () => {
     const [token, setToken] = useContext(UserContext);
     const navigate = useNavigate();
     const handleBack = (e) => { navigate("/Home")}
+
     const [val] = React.useState(isFirefox);
+
     const [data_out, setData_out] = useState([]); 
     let queries, variable;
     
@@ -250,6 +243,16 @@ const Delete = () => {
         setToken(null)              
         navigate("/"); 
     }
+    function forToysSearch(value) {
+        if (document.getElementById("type_select").value == "Book") {
+            document.getElementById("author_input").placeholder = sc_gen("UUID", "a", val);
+            document.getElementById("tittle_input").placeholder = sc_gen("Titulo", "t", val);
+        }
+        else {
+            document.getElementById("author_input").placeholder = sc_gen("UUID", "a", val);
+            document.getElementById("tittle_input").placeholder = sc_gen("Nombre", "t", val);
+        }
+    }
 
     return (
         <section>
@@ -275,9 +278,9 @@ const Delete = () => {
                 <div className="top-right">
                         <form className="all-inputs">
                             <div className="first-row">
-                                <select name="t_product" id="type_select" >
-                                    <option value="Book" selected>Book</option>
-                                    <option value="Toy">Toy</option>
+                                <select name="t_product" id="type_select" onChange={forToysSearch}>
+                                    <option value="Book" selected>Item Book</option>
+                                    <option value="Toy">Item Toy</option>
                                 </select>   
 
                                  <input type="text" placeholder="UUID" id="author_input" accessKey="a"/>
@@ -287,19 +290,10 @@ const Delete = () => {
                                 
                             </div>
 
-                            <div className="second-row">
-                             
-
-                               
-                                
-                            </div>
+                            <div className="second-row"> </div>
                             <input type="submit" value="Search" onClick={handlequery}/>
-                            
+                            <div className="third-row"> </div>
                         </form>
-
-                            <div className="third-row">
-
-                            </div>
 
                             
                         <div className="results-wrapper-delete">
@@ -313,6 +307,9 @@ const Delete = () => {
                                 paginationRowsPerPageOptions={[]}
                                 fixedHeader
                             />
+                        </div>
+                        <div className="to_download">
+                            <CSVLink data={data_out} filename={"report.csv"}>Export</CSVLink>
                         </div>
                     </div>
                     </div>
