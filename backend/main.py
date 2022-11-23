@@ -685,8 +685,9 @@ async def delete(
 ):
     body = await request.body()
     body_unjasoned = _json.loads(body)
+    print(body_unjasoned)
     #Yes, this is retarded. it is also the easiest way I found of doing it
-    if (body_unjasoned["type"]["type"] == "Toy"):
-        await _services.remove_juguete(body_unjasoned["uuid"]["uuid"])
-    elif (body_unjasoned["type"]["type"] == "Book"):
-        await _services.remove_libro(body_unjasoned["uuid"]["uuid"])
+    if (body_unjasoned["type"] == "Toy"):
+       await _services.remove_juguete(body_unjasoned["uuid"])
+    elif (body_unjasoned["type"] == "Book"):
+       await _services.remove_libro(body_unjasoned["uuid"])
