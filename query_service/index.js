@@ -52,25 +52,25 @@ app.get('/', async (req, res) => {
     }); 
 })
 
-app.get('/objetos', async (req, res) => {
-    books = await resolvers.libros({}, {auth: req.headers["authorization"]});
-    toys = await resolvers.juguetes({}, {auth: req.headers["authorization"]});
-    res.json({
-        books: books,
-        toys: toys
-    })
-})
+// app.get('/objetos', async (req, res) => {
+//     books = await resolvers.libros({}, {auth: req.headers["authorization"]});
+//     toys = await resolvers.juguetes({}, {auth: req.headers["authorization"]});
+//     res.json({
+//         books: books,
+//         toys: toys
+//     })
+// })
 
-app.get('/items', async (req, res) => {
-    books = await resolvers.item_libro({}, {auth: req.headers["authorization"]});
-    toys = await resolvers.item_juguete({}, {auth: req.headers["authorization"]});
-    res.json({
-        len_books: books.length,
-        len_toys: toys.length,
-        books: books,
-        toys: toys
-    })
-})
+// app.get('/items', async (req, res) => {
+//     books = await resolvers.item_libro({}, {auth: req.headers["authorization"]});
+//     toys = await resolvers.item_juguete({}, {auth: req.headers["authorization"]});
+//     res.json({
+//         len_books: books.length,
+//         len_toys: toys.length,
+//         books: books,
+//         toys: toys
+//     })
+// })
 
 // GRAPHQL
 
