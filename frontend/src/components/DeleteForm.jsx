@@ -154,6 +154,16 @@ const Delete = () => {
                         }
                     ]
                     },
+
+                    {
+                        "or": [
+                        {
+                            "field": "uuid",
+                            "contains": uuid
+                        }
+                        ],                        
+                    },
+            
                     
                 ]	
                 }
@@ -162,17 +172,7 @@ const Delete = () => {
 
 
 
-            /*
-                    {
-                        "or": [
-                        {
-                            "field": "uuid",
-                            "contains": uuid
-                        }
-                        ],
-                        
-                    },
-            */
+            
         } else { 
             uuid = document.getElementById("author_input").value; 
             titulos = document.getElementById("title_input").value; 
@@ -198,13 +198,10 @@ const Delete = () => {
                         }
                         ]
                         
-                    }]
-                } 
-            }
-            columns = columns_juguetes;
-            /*
-            {       
-                    "or": [
+                    },
+
+                    {
+                        "or": [
                         {
                             "field": "uuid",
                             "contains": uuid
@@ -212,7 +209,11 @@ const Delete = () => {
                         ],
                         
                     },
-             */
+            
+                ]
+                } 
+            }
+            columns = columns_juguetes;
         }
         
         const response =  await axios.post(
