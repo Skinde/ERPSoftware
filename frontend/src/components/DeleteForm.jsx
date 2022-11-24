@@ -111,10 +111,20 @@ const Delete = () => {
         { name: "uuid", selector: row => row.uuid , sortable: true, center: false, left: true, grow: 1.5 },
         { name: "Nombre", selector: row => row.nombre, sortable: false, center: false, right: true },
         {
-            name: '¿Eliminar?',
+            name: '¿Eliminar?',             
             button: true,
-            cell: () => <button type="button">Sí</button>,
-            
+            cell: props => 
+            {
+            return(    
+            <div onClick={() => {handleDel("Toy",props)}}>
+                <IconButton type="button"
+                        aria-label="delete"
+                        color="secondary"
+                    >
+                        <DeleteIcon/>
+                    </IconButton>
+            </div>)
+            },
         },
     ]
 
@@ -246,11 +256,11 @@ const Delete = () => {
     function forToysSearch(value) {
         if (document.getElementById("type_select").value == "Book") {
             document.getElementById("author_input").placeholder = sc_gen("UUID", "a", val);
-            document.getElementById("tittle_input").placeholder = sc_gen("Titulo", "t", val);
+            document.getElementById("title_input").placeholder = sc_gen("Titulo", "t", val);
         }
         else {
             document.getElementById("author_input").placeholder = sc_gen("UUID", "a", val);
-            document.getElementById("tittle_input").placeholder = sc_gen("Nombre", "t", val);
+            document.getElementById("title_input").placeholder = sc_gen("Nombre", "t", val);
         }
     }
 

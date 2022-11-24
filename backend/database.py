@@ -4,7 +4,6 @@ import dotenv as _dotenv
 _dotenv.load_dotenv()
 
 import os
-from sqlalchemy_searchable import make_searchable
 
 SQLALCHEMY_DATABASE_URL = os.environ.get('PSQL_URI')
 

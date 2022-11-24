@@ -19,10 +19,6 @@ from fastapi import Request
 import sqlalchemy as _sqlalchemy
 import sqlalchemy.orm as _orm
 
-from sqlalchemy_searchable import search
-from sqlalchemy_searchable import make_searchable
-
-
 _services.create_database()
 
 
@@ -436,7 +432,7 @@ async def get_inventario_juguetes(
         return {
             "success": True,
             "#": len(db_response),
-            "inventario_juguetes": [ins.__dict__ for ins in db_response]
+            "inventario_juguetes": [ins.__dict__ for ins in db_response  if ins.estado=='disponible']
         }
     except Exception as e:
         print(e)

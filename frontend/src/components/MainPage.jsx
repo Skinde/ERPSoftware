@@ -341,7 +341,7 @@ const MainPage = () => {
         let ts = document.getElementById("type_select").value;
         if (ts == "libros") {
             document.getElementById("author_input").placeholder = sc_gen("Autor", "a", val);
-            document.getElementById("tittle_input").placeholder = sc_gen("Titulo", "t", val);
+            document.getElementById("title_input").placeholder = sc_gen("Titulo", "t", val);
             document.getElementById("publisher_input").placeholder = sc_gen("Publicista", "p", val);
             document.getElementById("edition_input").placeholder = sc_gen("Edición", "k", val);
             document.getElementById("year_input").placeholder = sc_gen("Año", "y", val);
@@ -352,7 +352,7 @@ const MainPage = () => {
         }
         else if (ts == "juguetes") {
             document.getElementById("author_input").placeholder = sc_gen("Nombre", "a", val);
-            document.getElementById("tittle_input").placeholder = sc_gen("Tema", "t", val);
+            document.getElementById("title_input").placeholder = sc_gen("Tema", "t", val);
             document.getElementById("publisher_input").placeholder = sc_gen("Material", "p", val);
             document.getElementById("edition_input").placeholder = sc_gen("Energía", "k", val);
             document.getElementById("year_input").placeholder = sc_gen("Publico", "y", val);
@@ -363,7 +363,7 @@ const MainPage = () => {
         }
         else if (ts == "libro_item") {
             document.getElementById("author_input").placeholder = sc_gen("UUID", "a", val);
-            document.getElementById("tittle_input").placeholder = sc_gen("Titulo", "t", val);
+            document.getElementById("title_input").placeholder = sc_gen("Titulo", "t", val);
             document.getElementById("publisher_input").placeholder = sc_gen("Estado", "p", val);
             document.getElementById("edition_input").placeholder = sc_gen("Sede", "k", val);
             document.getElementById("year_input").placeholder = sc_gen("Precio de compra", "y", val);
@@ -374,7 +374,7 @@ const MainPage = () => {
         }
         else {
             document.getElementById("author_input").placeholder = sc_gen("UUID", "a", val);
-            document.getElementById("tittle_input").placeholder = sc_gen("Nombre", "t", val);
+            document.getElementById("title_input").placeholder = sc_gen("Nombre", "t", val);
             document.getElementById("publisher_input").placeholder = sc_gen("Estado", "p", val);
             document.getElementById("edition_input").placeholder = sc_gen("Sede", "k", val);
             document.getElementById("year_input").placeholder = sc_gen("Precio de compra", "y", val);
